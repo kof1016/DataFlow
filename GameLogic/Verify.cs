@@ -1,6 +1,6 @@
 ﻿using DataDefine;
 
-using Utility;
+using Library.Synchronize;
 
 namespace GameLogic
 {
@@ -23,17 +23,17 @@ namespace GameLogic
 
             var val = _AccountFinder.FindAccountByName(id);
             val.OnValueEvent += account =>
-            {
-                if(account != null && account.IsPassword(password))
                 {
-                    OnDoneEvent?.Invoke(account);
-                    returnValue.SetValue(true);
-                }
-                else
-                {
-                    returnValue.SetValue(false);
-                }
-            };
+                    if(account != null && account.IsPassword(password))
+                    {
+                        OnDoneEvent?.Invoke(account);
+                        returnValue.SetValue(true);
+                    }
+                    else
+                    {
+                        returnValue.SetValue(false);
+                    }
+                };
 
             return returnValue;
         }

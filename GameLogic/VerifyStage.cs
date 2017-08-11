@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DataDefine;
 
-using DataDefine;
+using Library.Utility;
 
-using Utility;
+using Synchronization;
 
 namespace GameLogic
 {
@@ -13,6 +13,7 @@ namespace GameLogic
         private readonly ISoulBinder _Binder;
 
         private readonly Verify _Verify;
+
         public VerifyStage(ISoulBinder binder, Verify verify)
         {
             _Binder = binder;
@@ -35,7 +36,6 @@ namespace GameLogic
 
         void IStage.Update()
         {
-            
         }
     }
 }

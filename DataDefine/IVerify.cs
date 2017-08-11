@@ -1,4 +1,4 @@
-using Utility;
+using Library.Synchronize;
 
 namespace DataDefine
 {

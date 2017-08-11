@@ -41,11 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Center.cs" />
-    <Compile Include="Hall.cs" />
-    <Compile Include="OnNewUser.cs" />
+    <Compile Include="Play\Center.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="Play\User.cs" />
     <Compile Include="Verify.cs" />
     <Compile Include="VerifyStage.cs" />
   </ItemGroup>
@@ -54,9 +52,13 @@
       <Project>{ee4fd0b5-ad5a-4f99-93d0-2a81d8deb403}</Project>
       <Name>DataDefine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Utility\Utility.csproj">
+    <ProjectReference Include="..\Synchronization\Synchronization.csproj">
+      <Project>{71b3c1bc-00cb-4994-9775-f8b940c81cca}</Project>
+      <Name>Synchronization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Library.csproj">
       <Project>{d62013ba-4663-4657-9fba-97d6b1776f3c}</Project>
-      <Name>Utility</Name>
+      <Name>Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
