@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+
+using Synchronization;
+
+namespace SyncLocal
+{
+    internal class GhostRequest : IGhostRequest
+    {
+        public event InvokeMethodCallback OnCallMethodEvent;
+
+        public event Action OnPingEvent;
+
+        public event Action<Guid> OnReleaseEvent;
+
+        private readonly Queue<RequestPackage> _Requests;
+
+        public GhostRequest()
+        {
+            _Requests = new Queue<RequestPackage>();
+        }
+
+        void IGhostRequest.Request(ClientToServerOpCode code, object arg)
+        {
+            lock(_Requests)
+            {
+                _Requests.Enqueue(
+                                  new RequestPackage
+                                      {
+                                          Code = code,
+                                          Data = arg
+                                  });
+            }
+        }
+
+        public void Update()
+        {
+            var requests = new Queue<RequestPackage>();
+            lock(_Requests)
+            {
+                while(_Requests.Count > 0)
+                {
+                    requests.Enqueue(_Requests.Dequeue());
+                }
+            }
+
+            while(requests.Count > 0)
+            {
+                var request = requests.Dequeue();
+                _Apportion(request.Code, request.Data);
+            }
+        }
+
+        private void _Apportion(ClientToServerOpCode code, object arg)
+        {
+            switch(code)
+            {
+                case ClientToServerOpCode.PING:
+                    OnPingEvent?.Invoke();
+                    break;
+                case ClientToServerOpCode.CALL_METHOD:
+                    {
+                        var pkg = arg as PackageCallMethod;
+
+                        if(pkg != null)
+                        {
+                            OnCallMethodEvent?.Invoke(pkg.EntityId, pkg.MethodId, pkg.ReturnId, pkg.MethodParams);
+                        }
+                    }
+
+                    break;
+                case ClientToServerOpCode.RELEASE:
+                    {
+                        var pkg = (PackageRelease)arg;
+
+                        // var EntityId = new Guid(args[0]);
+                        OnReleaseEvent?.Invoke(pkg.EntityId);
+                    }
+
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(code), code, null);
+            }
+        }
+    }
+}
