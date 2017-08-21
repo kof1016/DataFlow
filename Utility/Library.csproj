@@ -44,6 +44,7 @@
     <Compile Include="Game\Hall.cs" />
     <Compile Include="Synchronize\IProvider.cs" />
     <Compile Include="Synchronize\TProvider.cs" />
+    <Compile Include="TypeHelper\AssemblyBuilder.cs" />
     <Compile Include="TypeHelper\BilateralMap.cs" />
     <Compile Include="Utility\CodeBuilder.cs" />
     <Compile Include="Utility\Comparison.cs" />

@@ -45,11 +45,11 @@
     <Compile Include="AutoRelease.cs" />
     <Compile Include="CommandParser.cs" />
     <Compile Include="GenericEventClosure.cs" />
+    <Compile Include="GhostInterfaceProvider.cs" />
     <Compile Include="GhostMethodHandler.cs" />
     <Compile Include="IAgent.cs" />
     <Compile Include="IEventProxyCreator.cs" />
     <Compile Include="IGhostRequest.cs" />
-    <Compile Include="InterfaceProvider.cs" />
     <Compile Include="IProtocol.cs" />
     <Compile Include="IRequestQueue.cs" />
     <Compile Include="IResponseQueue.cs" />

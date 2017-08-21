@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Timers;
 
 using Library.Synchronize;
+using Library.TypeHelper;
 using Library.Utility;
 
 namespace Synchronization
@@ -18,9 +19,9 @@ namespace Synchronization
 
         private readonly AutoRelease _AutoRelease;
 
-        private readonly InterfaceProvider _GhostProvider;
+        private readonly GhostInterfaceProvider _GhostProvider;
 
-        private readonly Dictionary<Type, IProvider> _Providers;
+        private readonly Dictionary<string, IProvider> _ServerProviders;
 
         private readonly ReturnValueQueue _ReturnValueQueue;
 
@@ -42,8 +43,7 @@ namespace Synchronization
         {
             _ReturnValueQueue = new ReturnValueQueue();
 
-            // _GhostProvider = _Protocol.GetInterfaceProvider();
-            _Providers = new Dictionary<Type, IProvider>();
+            _ServerProviders = new Dictionary<string, IProvider>();
             _AutoRelease = new AutoRelease(_Requester);
         }
 
@@ -58,9 +58,9 @@ namespace Synchronization
         public void Finial()
         {
             Enable = false;
-            lock(_Providers)
+            lock(_ServerProviders)
             {
-                foreach(var providerPair in _Providers)
+                foreach(var providerPair in _ServerProviders)
                 {
                     providerPair.Value.ClearGhosts();
                 }
@@ -197,40 +197,37 @@ namespace Synchronization
 
         CodeBuilder codeBuilder = new CodeBuilder();
 
-        private Dictionary<string, Type> _GhostTypes; 
         private void _LoadSoul(string type_name, Guid id, bool return_type)
         {
-            _GhostTypes
-
-            // find soul typename
-            
-            // create ghost type
-
             Type type;
-            foreach(var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                
-                foreach (var t in asm.GetTypes())
-                {
 
-                    if(t.Name == type_name)
-                    {
-                        
-                        codeBuilder.GpiEvent += (s, s1) =>
-                            {
+            var provider = _QueryProvider(type_name);
 
-                            };
-                        codeBuilder.Build(t);
-                       
-                        // call proxy  
-                    }
-                }
-            }
+            var ghost = _BuildGhost(_FindType(type_name), _Requester, id, return_type);
 
-            var provider = _QueryProvider(type);
-            var ghost = _BuildGhost(type, _Requester, id, return_type);
 
-            ghost.CallMethodEvent += new GhostMethodHandler(ghost, _ReturnValueQueue, _Protocol, _Requester).Run;
+//            lock (_ServerProviders)
+//            {
+//                if(_ServerProviders.ContainsKey(type_name)) // find soul typename
+//                {
+//                
+//                }
+//                else // create ghost type
+//                {
+//                    codeBuilder.GpiEvent += (s, s1) => { };
+//
+//                    codeBuilder.Build(t);
+//
+//                    // call proxy  
+//                    _FindType(type_name);
+//                }
+//            }
+            
+
+           // var provider = _QueryProvider(type);
+            //var ghost = _BuildGhost(type, _Requester, id, return_type);
+
+            ghost.CallMethodEvent += new GhostMethodHandler(ghost, _ReturnValueQueue, _Requester).Run;
 
             provider.Add(ghost);
 
@@ -238,6 +235,22 @@ namespace Synchronization
             {
                 _RegisterRelease(ghost);
             }
+        }
+
+        private Type _FindType(string type_name)
+        {
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var t in asm.GetTypes())
+                {
+                    if (t.Name == type_name)
+                    {
+                        return t;
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void _UnloadSoul(int type_id, Guid id)
@@ -281,31 +294,28 @@ namespace Synchronization
 
         public INotifier<T> QueryProvider<T>()
         {
-            return _QueryProvider(typeof(T)) as INotifier<T>;
+            return _QueryProvider(typeof(T).Name) as INotifier<T>;
         }
 
-        private IProvider _QueryProvider(Type type)
+        private IProvider _QueryProvider(string type_name)
         {
             IProvider provider = null;
-            lock(_Providers)
+            lock(_ServerProviders)
             {
-                if(_Providers.TryGetValue(type, out provider) == false)
+                if(_ServerProviders.TryGetValue(type_name, out provider) == false)
                 {
-                    provider = _BuildProvider(type);
-                    _Providers.Add(type, provider);
+                    provider = _BuildServerProvider(type_name);
+                    _ServerProviders.Add(type_name, provider);
                 }
             }
 
             return provider;
         }
 
-        
-        private IProvider _BuildProvider(Type type)
+        private IProvider _BuildServerProvider(string type_name)
         {
-            
-
             var providerTemplateType = typeof(TProvider<>);
-            var providerType = providerTemplateType.MakeGenericType(type);
+            var providerType = providerTemplateType.MakeGenericType(_FindType(type_name));
             return Activator.CreateInstance(providerType) as IProvider;
         }
 
@@ -361,11 +371,30 @@ namespace Synchronization
             }
         }
 
+        private Type _QueryGhostType(Type ghostBaseType)
+        {
+
+            if(_GhostProvider.Find(ghostBaseType) == null)
+            {
+
+                new AssemblyBuilder().Build(ghostBaseType)
+                //codeBuilder.Build(ghostBaseType);
+
+                //codeBuilder.GpiEvent += CodeBuilder_GpiEvent;
+                
+            }
+        }
+
+        private void CodeBuilder_GpiEvent(string type_name, string codes)
+        {
+            
+        }
+
         private IGhost _FindGhost(Guid ghost_id)
         {
-            lock(_Providers)
+            lock(_ServerProviders)
             {
-                return (from provider in _Providers
+                return (from provider in _ServerProviders
                         let r = (from g in provider.Value.Ghosts
                                  where ghost_id == g.GetID()
                                  select g).FirstOrDefault()

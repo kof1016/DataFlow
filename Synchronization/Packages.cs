@@ -79,7 +79,7 @@ namespace Synchronization
     {
         public Guid EntityId;
 
-        public int MethodId;
+        public string MethodName;
 
         public Guid ReturnId;
 
