@@ -7,7 +7,7 @@ namespace Synchronization
     {
         EventProvider GetEventProvider();
 
-        InterfaceProvider GetInterfaceProvider();
+        //InterfaceProvider GetInterfaceProvider();
 
         MemberMap GetMemberMap();
 

@@ -2,7 +2,7 @@
 
 namespace Synchronization
 {
-    public delegate void InvokeMethodCallback(Guid entity_id, int method_id, Guid return_id, object[] args);
+    public delegate void InvokeMethodCallback(Guid entity_id, string method_name, Guid return_id, object[] args);
 
     public interface IRequestQueue
     {

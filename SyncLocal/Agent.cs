@@ -32,7 +32,7 @@ namespace SyncLocal
 
         private ISoulBinder _Binder => _SoulProvider;
 
-        public Agent(IProtocol protocol)
+        public Agent()
         {
             _GhostRequest = new GhostRequest();
             _Agent = new AgentCore();

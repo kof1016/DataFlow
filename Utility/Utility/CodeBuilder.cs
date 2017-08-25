@@ -74,10 +74,13 @@ namespace Library.Utility
             
             readonly Guid {CodeBuilder._GhostIdName};
 
-            public C{name}(Guid id, bool have_return )
+            readonly Type _GhostType;
+
+            public C{name}(Guid id, Type ghost_type, bool have_return )
             {{
                 _HaveReturn = have_return ;
                 {CodeBuilder._GhostIdName} = id;            
+                _GhostType = ghost_type;
             }}
             
             Guid Library.Synchronize.IGhost.GetID()
@@ -93,6 +96,11 @@ namespace Library.Utility
             bool Library.Synchronize.IGhost.IsReturnType()
             {{
                 return _HaveReturn;
+            }}
+
+            Type Library.Synchronize.IGhost.GetType()
+            {{
+                return _GhostType;
             }}
             
             {implementCode}

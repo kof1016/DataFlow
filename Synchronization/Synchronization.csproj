@@ -44,6 +44,7 @@
     <Compile Include="AgentCore.cs" />
     <Compile Include="AutoRelease.cs" />
     <Compile Include="CommandParser.cs" />
+    <Compile Include="EventProvider.cs" />
     <Compile Include="GenericEventClosure.cs" />
     <Compile Include="GhostInterfaceProvider.cs" />
     <Compile Include="GhostMethodHandler.cs" />

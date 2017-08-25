@@ -18,20 +18,20 @@ namespace Synchronization
 
     public class PackageUpdateProperty 
     {
+        public string PropertyName;
+
         public Guid EntityId;
 
-        public int Property;
-
-        public object[] Args;
+        public object Arg;
     }
 
     public class PackageInvokeEvent
     {
+        public string EventName;
+
         public Guid EntityId;
 
-        public int Event;
-
-        public byte[][] EventParams;
+        public object[] EventParams;
     }
 
     public class PackageErrorMethod
@@ -52,7 +52,7 @@ namespace Synchronization
 
     public class PackageLoadSoulCompile
     {
-        public int TypeId;
+        public string TypeName;
 
         public Guid EntityId;
 
@@ -70,16 +70,16 @@ namespace Synchronization
 
     public class PackageUnloadSoul
     {
-        public int TypeId;
+        public string TypeName;
 
         public Guid EntityId;
     }
 
     public class PackageCallMethod
     {
-        public Guid EntityId;
-
         public string MethodName;
+
+        public Guid EntityId;
 
         public Guid ReturnId;
 
@@ -94,10 +94,5 @@ namespace Synchronization
     public class PackageRelease
     {
         public Guid EntityId;
-    }
-
-    public class Pkg
-    {
-        Pkgs[]
     }
 }

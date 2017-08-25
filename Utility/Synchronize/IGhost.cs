@@ -13,6 +13,8 @@ namespace Library.Synchronize
 
         bool IsReturnType();
 
+        Type GetType();
+
         event CallMethodCallback CallMethodEvent;
     }
 }

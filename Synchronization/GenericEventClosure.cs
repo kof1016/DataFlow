@@ -2,20 +2,20 @@ using System;
 
 namespace Synchronization
 {
-    public delegate void InvokeEventCallback(Guid entity_id, int event_id, object[] args);
+    public delegate void InvokeEventCallback(Guid entity_id, string event_name, object[] args);
 
     public class GenericEventClosure
     {
         private readonly Guid _EntityId;
 
-        private readonly int _EventId;
+        private readonly string _EventName;
 
         private readonly InvokeEventCallback _InvokeEvent;
 
-        public GenericEventClosure(Guid entity_id, int event_id, InvokeEventCallback invoke_event)
+        public GenericEventClosure(Guid entity_id, string event_name, InvokeEventCallback invoke_event)
         {
             _EntityId = entity_id;
-            _EventId = event_id;
+            _EventName = event_name;
             _InvokeEvent = invoke_event;
         }
 
@@ -28,7 +28,7 @@ namespace Synchronization
         {
             _InvokeEvent(
                          _EntityId,
-                         _EventId,
+                         _EventName,
                          new object[]
                              {
                              });
@@ -39,14 +39,14 @@ namespace Synchronization
     {
         private readonly Guid _EntityId;
 
-        private readonly int _EventId;
+        private readonly string _EventName;
 
         private readonly InvokeEventCallback _InvokeEvent;
 
-        public GenericEventClosure(Guid entity_id, int event_id, InvokeEventCallback invoke_event)
+        public GenericEventClosure(Guid entity_id, string event_name, InvokeEventCallback invoke_event)
         {
             _EntityId = entity_id;
-            _EventId = event_id;
+            _EventName = event_name;
             _InvokeEvent = invoke_event;
         }
 
@@ -59,7 +59,7 @@ namespace Synchronization
         {
             _InvokeEvent(
                          _EntityId,
-                         _EventId,
+                         _EventName,
                          new object[]
                              {
                                  arg1
@@ -71,14 +71,14 @@ namespace Synchronization
     {
         private readonly Guid _EntityId;
 
-        private readonly int _EventId;
+        private readonly string _EventName;
 
         private readonly InvokeEventCallback _InvokeEvent;
 
-        public GenericEventClosure(Guid entity_id, int event_id, InvokeEventCallback invoke_event)
+        public GenericEventClosure(Guid entity_id, string event_name, InvokeEventCallback invoke_event)
         {
             _EntityId = entity_id;
-            _EventId = event_id;
+            _EventName = event_name;
             _InvokeEvent = invoke_event;
         }
 
@@ -91,7 +91,7 @@ namespace Synchronization
         {
             _InvokeEvent(
                          _EntityId,
-                         _EventId,
+                         _EventName,
                          new object[]
                              {
                                  arg1,
@@ -104,14 +104,14 @@ namespace Synchronization
     {
         private readonly Guid _EntityId;
 
-        private readonly int _EventId;
+        private readonly string _EventName;
 
         private readonly InvokeEventCallback _InvokeEvent;
 
-        public GenericEventClosure(Guid entity_id, int event_id, InvokeEventCallback invoke_event)
+        public GenericEventClosure(Guid entity_id, string event_name, InvokeEventCallback invoke_event)
         {
             _EntityId = entity_id;
-            _EventId = event_id;
+            _EventName = event_name;
             _InvokeEvent = invoke_event;
         }
 
@@ -124,7 +124,7 @@ namespace Synchronization
         {
             _InvokeEvent(
                          _EntityId,
-                         _EventId,
+                         _EventName,
                          new object[]
                              {
                                  arg1,
@@ -138,14 +138,14 @@ namespace Synchronization
     {
         private readonly Guid _EntityId;
 
-        private readonly int _EventId;
+        private readonly string _EventName;
 
         private readonly InvokeEventCallback InvokeEvent;
 
-        public GenericEventClosure(Guid entity_id, int event_id, InvokeEventCallback invoke_event)
+        public GenericEventClosure(Guid entity_id, string event_name, InvokeEventCallback invoke_event)
         {
             _EntityId = entity_id;
-            _EventId = event_id;
+            _EventName = event_name;
             InvokeEvent = invoke_event;
         }
 
@@ -158,7 +158,7 @@ namespace Synchronization
         {
             InvokeEvent(
                         _EntityId,
-                        _EventId,
+                        _EventName,
                         new object[]
                             {
                                 arg1,
@@ -175,14 +175,14 @@ namespace Synchronization
 
         private readonly Guid _EntityId;
 
-        private readonly int _EventId;
+        private readonly string _EventName;
 
         private readonly InvokeEventCallback _InvokeEvent;
 
-        public GenericEventClosure(Guid entity_id, int event_id, InvokeEventCallback invoke_event)
+        public GenericEventClosure(Guid entity_id, string event_name, InvokeEventCallback invoke_event)
         {
             _EntityId = entity_id;
-            _EventId = event_id;
+            _EventName = event_name;
             _InvokeEvent = invoke_event;
         }
 
@@ -195,7 +195,7 @@ namespace Synchronization
         {
             _InvokeEvent(
                          _EntityId,
-                         _EventId,
+                         _EventName,
                          new object[]
                              {
                                  arg1,

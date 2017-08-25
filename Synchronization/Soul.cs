@@ -15,26 +15,25 @@ namespace Synchronization
 
         public class PropertyHandler
         {
+            public readonly string PropertyName;
+
             public readonly PropertyInfo PropertyInfo;
 
             public object Value;
 
-            public readonly int Id;
-
-            public PropertyHandler(PropertyInfo info, int id)
+            public PropertyHandler(PropertyInfo info, string property_name)
             {
                 PropertyInfo = info;
-                Id = id;
+                PropertyName = property_name;
             }
 
             internal bool UpdateProperty(object val)
             {
-                if (!ValueHelper.DeepEqual(Value, val))
-                {
-                    Value = ValueHelper.DeepCopy(val);
-                    return true;
-                }
-
+                // if (!ValueHelper.DeepEqual(Value, val))
+                // {
+                // Value = ValueHelper.DeepCopy(val);
+                // return true;
+                // }
                 return false;
             }
         }
@@ -51,25 +50,21 @@ namespace Synchronization
 
         public PropertyHandler[] PropertyHandlers { get; set; }
 
-        public int InterfaceId { get; set; }
-
+        // public int InterfaceId { get; set; }
         internal void ProcessDiffentValues(Action<Guid, int, object> update_property)
         {
-            foreach (var handler in PropertyHandlers)
+            foreach(var handler in PropertyHandlers)
             {
                 var val = handler.PropertyInfo.GetValue(ObjectInstance, null);
 
-                if (handler.UpdateProperty(val))
+                if(handler.UpdateProperty(val))
                 {
-                    if (update_property != null)
+                    if(update_property != null)
                     {
                         update_property(ID, handler.Id, val);
                     }
                 }
             }
         }
-
     }
-
-    
 }

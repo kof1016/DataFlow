@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 
 using Library.Synchronize;
@@ -9,9 +8,9 @@ namespace Synchronization
     {
         private readonly IGhost _Ghost;
 
-        private readonly ReturnValueQueue _ReturnValueQueue;
-
         private readonly IGhostRequest _Requester;
+
+        private readonly ReturnValueQueue _ReturnValueQueue;
 
         public GhostMethodHandler(IGhost ghost, ReturnValueQueue return_value_queue, IGhostRequest requester)
         {
@@ -22,13 +21,17 @@ namespace Synchronization
 
         public void Run(MethodInfo info, object[] args, IValue return_value)
         {
-            var package = new PackageCallMethod();
-            package.EntityId = _Ghost.GetID();
-            package.MethodName = info.Name;
-            package.MethodParams = args;
+            var package = new PackageCallMethod
+                              {
+                                  EntityId = _Ghost.GetID(),
+                                  MethodName = info.Name,
+                                  MethodParams = args
+                              };
 
-            if (return_value != null)
+            if(return_value != null)
+            {
                 package.ReturnId = _ReturnValueQueue.PushReturnValue(return_value);
+            }
 
             _Requester.Request(ClientToServerOpCode.CALL_METHOD, package);
         }
