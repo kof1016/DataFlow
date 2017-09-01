@@ -4,6 +4,6 @@ namespace Synchronization
 {
     public interface IResponseQueue
     {
-        void Push(ServerToClientOpCode code, Type package);
+        void Push(ServerToClientOpCode code, object package);
     }
 }

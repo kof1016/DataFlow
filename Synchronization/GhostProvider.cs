@@ -10,7 +10,7 @@ using Library.Utility;
 
 namespace Synchronization
 {
-    public class AgentCore
+    public class GhostProvider
     {
         public event Action<string, string> OnErrorMethodEvent;
 
@@ -26,8 +26,6 @@ namespace Synchronization
 
         private readonly object _Sync = new object();
 
-        private MemberMap _MemberMap;
-
         private TimeCounter _PingTimeCounter = new TimeCounter();
 
         private Timer _PingTimer;
@@ -38,7 +36,7 @@ namespace Synchronization
 
         public bool Enable { get; private set; }
 
-        public AgentCore()
+        public GhostProvider()
         {
             _GhostInterfaceProvider = new GhostInterfaceProvider();
 
@@ -167,7 +165,7 @@ namespace Synchronization
             OnErrorMethodEvent?.Invoke(method, message);
         }
 
-        private void _SetReturnValue(Guid return_target, object[] return_value)
+        private void _SetReturnValue(Guid return_target, object return_value)
         {
             var value = _ReturnValueQueue.PopReturnValue(return_target);
             value?.SetValue(return_value);
@@ -341,7 +339,7 @@ namespace Synchronization
         {
             if(_GhostInterfaceProvider.Find(ghost_base_type) == null)
             {
-                var ghostType = new AssemblyBuilder().Build(ghost_base_type).GetType();
+                var ghostType = new AssemblyBuilder().Build(ghost_base_type);
 
                 _GhostInterfaceProvider.Add(ghost_base_type, ghostType);
             }

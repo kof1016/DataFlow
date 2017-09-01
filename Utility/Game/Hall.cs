@@ -18,7 +18,7 @@ namespace Library.Game
         {
         }
 
-        void IBootable._Shutdown()
+        void IBootable.Shutdown()
         {
         }
 

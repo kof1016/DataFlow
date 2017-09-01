@@ -7,15 +7,6 @@ using System.Threading.Tasks;
 
 namespace Synchronization.Tests1
 {
-    interface ICharactor
-    {
-        
-    }
-
-    class Charactor : ICharactor
-    {
-        
-    }
     [TestFixture]
     public class TestClass
     {

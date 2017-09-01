@@ -19,18 +19,16 @@ namespace Library.Utility
         {
             if(!type.IsInterface)
             {
+                return;
             }
 
             var ghostClassCode = _BuildGhostCode(type);
 
             var typeName = _GetTypeName(type);
 
-            if(GpiEvent != null)
-            {
-                GpiEvent(typeName, ghostClassCode);
-            }
+            GpiEvent?.Invoke(typeName, ghostClassCode);
 
-            foreach(var eventInfo in type.GetEvents())
+            foreach (var eventInfo in type.GetEvents())
             {
                 var eventCode = _BuildEventCode(type, eventInfo);
 
@@ -168,7 +166,7 @@ namespace Library.Utility
         {
             var methodCodes = new List<string>();
             var methods = type.GetMethods();
-            var id = 0;
+            //var id = 0;
             foreach(var methodInfo in methods)
             {
                 if(methodInfo.IsSpecialName)
@@ -205,7 +203,7 @@ namespace Library.Utility
                 {{                    
                     {addReturn}
                     var info = typeof({methodInfo.DeclaringType}).GetMethod(""{methodInfo.Name}"");
-                    _CallMethodEvent(info , new object[] {{{addParams}}} , returnValue);                    
+                    _OnCallMethodEvent(info , new object[] {{{addParams}}} , returnValue);                    
                     {returnValue}
                 }}";
 
@@ -234,7 +232,7 @@ namespace Library.Utility
             return string.Join(" ,", addParams.ToArray());
         }
 
-        private string _GetTypes(Type[] generic_type_arguments)
+        private string _GetTypes(IEnumerable<Type> generic_type_arguments)
         {
             var code = from t in generic_type_arguments
                        select $"{_GetTypeName(t)}";

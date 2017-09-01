@@ -25,11 +25,11 @@ namespace SyncLocal
             lock(_Requests)
             {
                 _Requests.Enqueue(
-                                  new RequestPackage
-                                      {
-                                          Code = code,
-                                          Data = arg
-                                  });
+                    new RequestPackage
+                    {
+                        Code = code,
+                        Data = arg
+                    });
             }
         }
 
@@ -61,19 +61,13 @@ namespace SyncLocal
                 case ClientToServerOpCode.CALL_METHOD:
                     {
                         var pkg = arg as PackageCallMethod;
-
-                        if(pkg != null)
-                        {
-                            OnCallMethodEvent?.Invoke(pkg.EntityId, pkg.MethodId, pkg.ReturnId, pkg.MethodParams);
-                        }
+                        OnCallMethodEvent?.Invoke(pkg.EntityId, pkg.MethodName, pkg.ReturnId, pkg.MethodParams);
                     }
 
                     break;
                 case ClientToServerOpCode.RELEASE:
                     {
-                        var pkg = (PackageRelease)arg;
-
-                        // var EntityId = new Guid(args[0]);
+                        var pkg = arg as PackageRelease;
                         OnReleaseEvent?.Invoke(pkg.EntityId);
                     }
 

@@ -8,6 +8,10 @@ namespace Synchronization
     {
         private readonly IEventProxyCreator[] _ProxyCreators;
 
+        public EventProvider()
+        {
+        }
+        
         public EventProvider(IEnumerable<IEventProxyCreator> closures)
         {
             _ProxyCreators = closures.ToArray();

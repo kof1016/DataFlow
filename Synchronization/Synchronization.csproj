@@ -41,25 +41,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentCore.cs" />
+    <Compile Include="GhostProvider.cs" />
     <Compile Include="AutoRelease.cs" />
-    <Compile Include="CommandParser.cs" />
-    <Compile Include="EventProvider.cs" />
-    <Compile Include="GenericEventClosure.cs" />
+    <Compile Include="PreGenerated\EventProvider.cs" />
+    <Compile Include="PreGenerated\GenericEventClosure.cs" />
     <Compile Include="GhostInterfaceProvider.cs" />
     <Compile Include="GhostMethodHandler.cs" />
-    <Compile Include="IAgent.cs" />
-    <Compile Include="IEventProxyCreator.cs" />
-    <Compile Include="IGhostRequest.cs" />
-    <Compile Include="IProtocol.cs" />
-    <Compile Include="IRequestQueue.cs" />
-    <Compile Include="IResponseQueue.cs" />
-    <Compile Include="ISoulBinder.cs" />
-    <Compile Include="MemberMap.cs" />
-    <Compile Include="Packages.cs" />
+    <Compile Include="Interface\IGhostQuerier.cs" />
+    <Compile Include="Interface\IEventProxyCreator.cs" />
+    <Compile Include="Interface\IGhostRequest.cs" />
+    <Compile Include="PreGenerated\IProtocol.cs" />
+    <Compile Include="Interface\IRequestQueue.cs" />
+    <Compile Include="Interface\IResponseQueue.cs" />
+    <Compile Include="Interface\ISoulBinder.cs" />
+    <Compile Include="PreGenerated\MemberMap.cs" />
+    <Compile Include="Data\Packages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReturnValueQueue.cs" />
-    <Compile Include="ServerToClientOpCode.cs" />
+    <Compile Include="Data\OpCode.cs" />
     <Compile Include="Soul.cs" />
     <Compile Include="SoulProvider.cs" />
   </ItemGroup>

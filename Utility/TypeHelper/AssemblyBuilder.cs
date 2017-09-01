@@ -2,7 +2,6 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 using Library.Utility;
 
@@ -46,7 +45,7 @@ namespace Library.TypeHelper
         // throw new Exception("Gpi compile error");
         // }
         // }
-        public Assembly Build(Type assembly)
+        public Type Build(Type base_type)
         {
             var optionsDic = new Dictionary<string, string>
                                  {
@@ -64,10 +63,8 @@ namespace Library.TypeHelper
                                       {
                                           "System.Core.dll",
                                           "System.xml.dll",
-                                          "RegulusLibrary.dll",
-                                          "RegulusRemoting.dll",
-                                          "Regulus.Serialization.dll",
-                                          assembly.Assembly.Location
+                                          "Library.dll",
+                                          base_type.Assembly.Location
                                       },
                                   TempFiles = new TempFileCollection()
                               };
@@ -75,8 +72,8 @@ namespace Library.TypeHelper
             var codes = new List<string>();
             var codeBuilder = new CodeBuilder();
             codeBuilder.OnEventEvent += (type_name, event_name, code) => codes.Add(code);
-            codeBuilder.GpiEvent += (type_name, code) => codes.Add(code);
-            codeBuilder.Build(assembly);
+            codeBuilder.GpiEvent += (type_name, code) => { codes.Add(code); };
+            codeBuilder.Build(base_type);
 
             var result = provider.CompileAssemblyFromSource(options, codes.ToArray());
             if(result.Errors.Count > 0)
@@ -86,7 +83,8 @@ namespace Library.TypeHelper
                 throw new Exception("Protocol compile error");
             }
 
-            return result.CompiledAssembly;
+            var ghostTypeName = "DataDefine.Ghost.C" + base_type.Name;
+            return result.CompiledAssembly.GetType(ghostTypeName);
         }
     }
 }

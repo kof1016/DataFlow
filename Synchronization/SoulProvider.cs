@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,8 +10,6 @@ namespace Synchronization
     public class SoulProvider : IDisposable, ISoulBinder
     {
         private readonly Queue<object[]> _EventFilter = new Queue<object[]>();
-
-        private readonly EventProvider _EventProvider;
 
         private readonly IRequestQueue _Peer;
 
@@ -27,10 +24,45 @@ namespace Synchronization
         public SoulProvider(IRequestQueue peer, IResponseQueue queue)
         {
             _Queue = queue;
-            _EventProvider;
-
             _Peer = peer;
             _Peer.OnInvokeMethodEvent += _InvokeMethod;
+        }
+
+        public void Update()
+        {
+            var intervalSpan = DateTime.Now - _UpdatePropertyInterval;
+            var intervalSeconds = intervalSpan.TotalSeconds;
+            if (intervalSeconds > 0.5)
+            {
+                foreach (var soul in _Souls)
+                {
+                    soul.ProcessDifferentValues(_UpdateProperty);
+                }
+
+                _UpdatePropertyInterval = DateTime.Now;
+            }
+
+            lock (_EventFilter)
+            {
+                foreach (var filter in _EventFilter)
+                {
+                    _Queue.Push(ServerToClientOpCode.InvokeEvent, filter);
+                }
+
+                _EventFilter.Clear();
+            }
+        }
+
+        public void Unbind(Guid entity_id)
+        {
+            var soul = (from s in _Souls
+                        where s.ID == entity_id
+                        select s).FirstOrDefault();
+
+            if (soul != null)
+            {
+                _Unbind(soul.ObjectInstance, soul.ObjectType);
+            }
         }
 
         void IDisposable.Dispose()
@@ -81,7 +113,7 @@ namespace Synchronization
         {
             if(soul == null)
             {
-                throw new ArgumentNullException("soul");
+                throw new ArgumentNullException("unbind erro is soul null");
             }
 
             _Unbind(soul, typeof(TSoul));
@@ -96,51 +128,108 @@ namespace Synchronization
                                            soul.MethodInfos,
                                            soul.ObjectInstance
                                        }).FirstOrDefault();
-            if(soulInfo != null)
+            if(soulInfo == null)
             {
-                var info = method_id;
-                var methodInfo =
-                        (from m in soulInfo.MethodInfos
-                         where m == info && m.GetParameters().Count() == args.Count()
-                         select m)
-                        .FirstOrDefault();
-                if(methodInfo != null)
-                {
-                    try
-                    {
-                        var argObjects = args.Select(arg => _Serializer.Deserialize(arg));
+                return;
+            }
 
-                        var returnValue = methodInfo.Invoke(soulInfo.ObjectInstance, argObjects.ToArray());
-                        if(returnValue != null)
-                        {
-                            _ReturnValue(return_id, returnValue as IValue);
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Log.Instance.WriteDebug(e.ToString());
-                        _ErrorDeserialize(method_id.ToString(), return_id, e.Message);
-                    }
+            var methodInfo =
+                    (from m in soulInfo.MethodInfos
+                     where m.Name == method_name && m.GetParameters().Length == args.Length
+                     select m)
+                    .FirstOrDefault();
+
+            if(methodInfo == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var returnValue = methodInfo.Invoke(soulInfo.ObjectInstance, args) as IValue;
+
+                if(returnValue != null)
+                {
+                    _ReturnValue(return_id, returnValue);
                 }
             }
+            catch(Exception)
+            {
+                throw new ArgumentNullException($"return value error {return_id}");
+            }
+        }
+
+        private void _ReturnValue(Guid return_id, IValue return_value)
+        {
+            if(_WaitValues.TryGetValue(return_id, out IValue outValue))
+            {
+                return;
+            }
+
+            _WaitValues.Add(return_id, return_value);
+            return_value.QueryValue(
+                obj =>
+                {
+                    if(return_value.IsInterface() == false)
+                    {
+                        _ReturnDataValue(return_id, return_value);
+                    }
+                    else
+                    {
+                        _ReturnSoulValue(return_id, return_value);
+                    }
+
+                    _WaitValues.Remove(return_id);
+                });
+        }
+
+        private void _ReturnDataValue(Guid return_id, IValue return_value)
+        {
+            var value = return_value.GetObject();
+            var package = new PackageReturnValue()
+            {
+                ReturnTarget = return_id,
+                ReturnValue = value
+            };
+            _Queue.Push(ServerToClientOpCode.ReturnValue, package);
+        }
+
+        private void _ReturnSoulValue(Guid return_id, IValue return_value)
+        {
+            var soul = return_value.GetObject();
+            var type = return_value.GetObjectType();
+
+            var prevSoul = (from soulInfo in _Souls
+                            where soulInfo.ObjectType == type && ReferenceEquals(soulInfo.ObjectInstance, soul) 
+                            select soulInfo).SingleOrDefault();
+
+            if(prevSoul != null)
+            {
+                return;
+            }
+
+            var newSoul = _NewSoul(soul, type);
+
+            _LoadSoul(newSoul.ObjectType, newSoul.ID, true);
+            newSoul.ProcessDifferentValues(_UpdateProperty);
+            _LoadSoulCompile(newSoul.ObjectType, newSoul.ID, return_id);
         }
 
         private void _Bind<TSoul>(TSoul soul, bool return_type, Guid return_id)
         {
-            var type = typeof(TSoul);
-
             var prevSoul = (from soulInfo in _Souls
-                            where object.ReferenceEquals(soulInfo.ObjectInstance, soul) && soulInfo.ObjectType == typeof(TSoul)
+                            where soulInfo.ObjectType == typeof(TSoul) && ReferenceEquals(soulInfo.ObjectInstance, soul)
                             select soulInfo).SingleOrDefault();
 
-            if(prevSoul == null)
+            if(prevSoul != null)
             {
-                var newSoul = _NewSoul(soul, typeof(TSoul));
-
-                _LoadSoul(newSoul.InterfaceId, newSoul.ID, return_type);
-                newSoul.ProcessDiffentValues(_UpdateProperty);
-                _LoadSoulCompile(newSoul.InterfaceId, newSoul.ID, return_id);
+                return;
             }
+
+            var newSoul = _NewSoul(soul, typeof(TSoul));
+            _LoadSoul(newSoul.ObjectType, newSoul.ID, return_type);
+            newSoul.ProcessDifferentValues(_UpdateProperty);
+            _LoadSoulCompile(newSoul.ObjectType, newSoul.ID, return_id);
         }
 
         private Soul _NewSoul(object soul, Type soul_type)
@@ -160,17 +249,18 @@ namespace Synchronization
             {
                 try
                 {
-                    var handler = _BuildDelegate(eventInfo, newSoul.ID, _InvokeEvent);
+                    var buildDelegate = _BuildDelegate(eventInfo, newSoul.ID, _InvokeEvent);
 
-                    var eh = new Soul.EventHandler
-                                 {
-                                     EventInfo = eventInfo,
-                                     DelegateObject = handler
-                                 };
-                    newSoul.EventHandlers.Add(eh);
+                    var eventHandler = new Soul.EventHandler
+                                           {
+                                               EventInfo = eventInfo,
+                                               DelegateObject = buildDelegate
+                                           };
+
+                    newSoul.EventHandlers.Add(eventHandler);
 
                     var addMethod = eventInfo.GetAddMethod();
-                    addMethod.Invoke(soul, new object[] { handler });
+                    addMethod.Invoke(soul, new object[] { buildDelegate });
                 }
                 catch(Exception ex)
                 {
@@ -215,36 +305,74 @@ namespace Synchronization
             var actionType = type.GetMethod("GetDelegateType").Invoke(instance, new object[0]) as Type;
 
             return Delegate.CreateDelegate(actionType, instance, "Run", true);
+
+            // Type[] genericEventClosureTypes =
+            // {
+            // typeof(Action),
+            // typeof(GenericEventClosure<>),
+            // typeof(GenericEventClosure<,>),
+            // typeof(GenericEventClosure<,,>),
+            // typeof(GenericEventClosure<,,,>),
+            // typeof(GenericEventClosure<,,,,>)
+            // };
         }
 
         private void _InvokeEvent(Guid entity_id, string event_name, object[] args)
         {
-            var package = new PackageInvokeEvent();
-            package.EntityId = entity_id;
-            package.EventName = event_name;
-            package.EventParams = args;
-            _InvokeEvent(package);
+            var package = new PackageInvokeEvent
+                              {
+                                  EventName = event_name,
+                                  EntityId = entity_id,
+                                  EventParams = args
+                              };
+
+            lock(_EventFilter)
+            {
+                _EventFilter.Enqueue(package.EventParams);
+            }
         }
 
-        private void _UpdateProperty(Guid entity_id, int property, object val)
+        private void _LoadSoul(Type soul_type, Guid id, bool return_type)
         {
-            var package = new PackageUpdateProperty();
+            var package = new PackageLoadSoul
+                              {
+                                  TypeName = soul_type.Name,
+                                  EntityId = id,
+                                  ReturnType = return_type
+                              };
+            _Queue.Push(ServerToClientOpCode.LoadSoul, package);
+        }
 
-            package.EntityId = entity_id;
-            package.Property = property;
+        private void _UpdateProperty(Guid entity_id, string property_name, object val)
+        {
+            var package = new PackageUpdateProperty
+                              {
+                                  EntityId = entity_id,
+                                  PropertyName = property_name,
+                                  Arg = val
+                              };
 
-            package.Args = _Serializer.Serialize(val);
+            _Queue.Push(ServerToClientOpCode.UpdateProperty, package);
+        }
 
-            _Queue.Push(ServerToClientOpCode.UpdateProperty, package.ToBuffer(_Serializer));
+        private void _LoadSoulCompile(Type soul_type, Guid id, Guid return_id)
+        {
+            var package = new PackageLoadSoulCompile
+                              {
+                                  TypeName = soul_type.Name,
+                                  EntityId = id,
+                                  ReturnId = return_id
+                              };
+
+            _Queue.Push(ServerToClientOpCode.LoadSoulCompile, package);
         }
 
         private void _Unbind(object soul, Type type)
         {
-            var soulInfo = (from soul_info in _Souls.UpdateSet()
-                            where object.ReferenceEquals(soul_info.ObjectInstance, soul) && soul_info.ObjectType == type
+            var soulInfo = (from soul_info in _Souls
+                            where soul_info.ObjectType == type && ReferenceEquals(soul_info.ObjectInstance, soul)
                             select soul_info).SingleOrDefault();
 
-            // var soulInfo = _Souls.CreateInstnace((soul_info) => { return Object.ReferenceEquals(soul_info.ObjectInstance, soul) && soul_info.ObjectType == typeof(TSoul); });
             if(soulInfo != null)
             {
                 foreach(var eventHandler in soulInfo.EventHandlers)
@@ -252,9 +380,20 @@ namespace Synchronization
                     eventHandler.EventInfo.RemoveEventHandler(soulInfo.ObjectInstance, eventHandler.DelegateObject);
                 }
 
-                _UnloadSoul(soulInfo.InterfaceId, soulInfo.ID);
-                _Souls.Remove(s => { return s == soulInfo; });
+                _UnloadSoul(soulInfo.ObjectType, soulInfo.ID);
+
+                _Souls.Remove(soulInfo);
             }
         }
+
+        private void _UnloadSoul(Type soul_type, Guid id)
+        {
+            var package = new PackageUnloadSoul
+                              {
+                                  TypeName = soul_type.Name,
+                                  EntityId = id
+                              };
+            _Queue.Push(ServerToClientOpCode.UnloadSoul, package);
+        }      
     }
 }

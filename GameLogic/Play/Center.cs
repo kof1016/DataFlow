@@ -29,7 +29,7 @@ namespace GameLogic.Play
             _Updater.Add(_Hall);
         }
 
-        void IBootable._Shutdown()
+        void IBootable.Shutdown()
         {
             _Updater.Shutdown();
         }

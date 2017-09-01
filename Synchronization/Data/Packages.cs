@@ -47,7 +47,7 @@ namespace Synchronization
     {
         public Guid ReturnTarget;
 
-        public object[] ReturnValue;
+        public object ReturnValue;
     }
 
     public class PackageLoadSoulCompile

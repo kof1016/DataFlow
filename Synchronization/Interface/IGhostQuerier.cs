@@ -5,7 +5,7 @@ using Library.Utility;
 
 namespace Synchronization
 {
-    public interface IAgent : IUpdatable
+    public interface IGhostQuerier : IUpdatable
     {
         /// <summary>
         ///     與遠端發生斷線
@@ -36,7 +36,7 @@ namespace Synchronization
         ///     2.本地驗證碼
         ///     會發生此訊息通常是因為client與server版本不相容所致.
         /// </summary>
-        event Action<byte[], byte[]> ErrorVerifyEvent;
+        event Action<string, string> ErrorVerifyEvent;
 
         /// <summary>
         ///     Ping
@@ -58,10 +58,10 @@ namespace Synchronization
         /// <summary>
         ///     連線
         /// </summary>
-        /// <param name="ipaddress"></param>
+        /// <param name="ip_address"></param>
         /// <param name="port"></param>
         /// <returns>如果連線成功會發生OnValue傳回true</returns>
-        Value<bool> Connect(string ipaddress, int port);
+        Value<bool> Connect(string ip_address, int port);
 
         /// <summary>
         ///     斷線

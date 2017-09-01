@@ -78,7 +78,7 @@ namespace GameLogic
             _ToVerify();
         }
 
-        void IBootable._Shutdown()
+        void IBootable.Shutdown()
         {
             _Binder.Unbind<IAccountStatus>(this);
 

@@ -75,7 +75,7 @@ namespace Library.Utility
             {
                 var launcher = launchers.Dequeue();
                 boots.Remove(launcher);
-                launcher._Shutdown();
+                launcher.Shutdown();
 
                 OnRemoveEvent?.Invoke(launcher);
             }
@@ -94,7 +94,7 @@ namespace Library.Utility
         {
             foreach(var o in boots)
             {
-                o._Shutdown();
+                o.Shutdown();
             }
         }
     }

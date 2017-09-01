@@ -8,6 +8,6 @@
     {
         void Launch();
 
-        void _Shutdown();
+        void Shutdown();
     }
 }

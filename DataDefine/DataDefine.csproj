@@ -44,9 +44,9 @@
     <Compile Include="Account.cs" />
     <Compile Include="IAccountFinder.cs" />
     <Compile Include="IAccountStatus.cs" />
+    <Compile Include="IMove.cs" />
     <Compile Include="IVerify.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TTTTT.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utility\Library.csproj">

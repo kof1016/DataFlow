@@ -29,7 +29,8 @@ namespace Synchronization
 
             internal bool UpdateProperty(object val)
             {
-                // if (!ValueHelper.DeepEqual(Value, val))
+                //TODO
+                //if (!ValueHelper.DeepEqual(Value, val))
                 // {
                 // Value = ValueHelper.DeepCopy(val);
                 // return true;
@@ -50,10 +51,11 @@ namespace Synchronization
 
         public PropertyHandler[] PropertyHandlers { get; set; }
 
-        // public int InterfaceId { get; set; }
-        internal void ProcessDiffentValues(Action<Guid, int, object> update_property)
+        //public int InterfaceId { get; set; }
+
+        internal void ProcessDifferentValues(Action<Guid, string, object> update_property)
         {
-            foreach(var handler in PropertyHandlers)
+            foreach (var handler in PropertyHandlers)
             {
                 var val = handler.PropertyInfo.GetValue(ObjectInstance, null);
 
@@ -61,7 +63,7 @@ namespace Synchronization
                 {
                     if(update_property != null)
                     {
-                        update_property(ID, handler.Id, val);
+                        update_property(ID, handler.PropertyName, val);
                     }
                 }
             }
