@@ -4,22 +4,21 @@ using Synchronization;
 
 using SyncLocal;
 
+using Updater = Library.Utility.Updater;
+
 namespace Console
 {
-    internal class Application : WindowConsole
+    public class Application : WindowConsole
     {
-        private readonly Library.Utility.Updater _Updater = new Library.Utility.Updater();
+        private readonly ISoulBinder _Binder;
 
         private readonly IGhostQuerier _GhostQuerier;
 
-        private readonly ISoulBinder _Binder;
-
-        
-        
+        private readonly Updater _Updater = new Updater();
 
         public Application()
         {
-            var agent = new Agent();            
+            var agent = new Agent();
             _GhostQuerier = agent.GhostQuerier; // client
             _Binder = agent.Binder; // server
         }

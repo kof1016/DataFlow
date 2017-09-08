@@ -1,7 +1,9 @@
 using System;
 using System.CodeDom.Compiler;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Library.Utility;
 
@@ -45,7 +47,7 @@ namespace Library.TypeHelper
         // throw new Exception("Gpi compile error");
         // }
         // }
-        public Type Build(Type base_type)
+        public Type Build(Type base_type, string path)
         {
             var optionsDic = new Dictionary<string, string>
                                  {
@@ -63,7 +65,7 @@ namespace Library.TypeHelper
                                       {
                                           "System.Core.dll",
                                           "System.xml.dll",
-                                          "Library.dll",
+                                          path,
                                           base_type.Assembly.Location
                                       },
                                   TempFiles = new TempFileCollection()
@@ -80,11 +82,21 @@ namespace Library.TypeHelper
             {
                 File.WriteAllLines("dump.cs", codes.ToArray());
 
-                throw new Exception("Protocol compile error");
+                var total = string.Join("\n", _GetErrors(result.Errors).ToArray());
+
+                throw new Exception(total);
             }
 
             var ghostTypeName = "DataDefine.Ghost.C" + base_type.Name;
             return result.CompiledAssembly.GetType(ghostTypeName);
+        }
+
+        private IEnumerable<string> _GetErrors(IEnumerable errors)
+        {
+            foreach(var error in errors)
+            {
+                yield return error.ToString();
+            }
         }
     }
 }

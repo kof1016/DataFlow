@@ -10,10 +10,10 @@ using IUpdatable = Library.Utility.IUpdatable;
 
 namespace Console
 {
-    internal class Visual : IUpdatable
+    public class Visual : IUpdatable
     {
         private readonly IGhostQuerier _GhostQuerier;
-        private Command _Command;
+        private readonly Command _Command;
         private Regulus.Utility.Console.IViewer _Viewer;
 
         public Visual(IGhostQuerier ghost_querier,
@@ -28,17 +28,11 @@ namespace Console
         void IBootable.Launch()
         {
             _Command.Register(
-                "Start",
+                "start",
                 () =>
                 {
                     _GhostQuerier.QueryNotifier<IVerify>().Supply += _SupplyVerify;
                 });
-
-            //_Command.Register("Shutdown", _Shutdown);
-
-
-            //_GhostQuerier.QueryNotifier<IVerify>().Supply += _SupplyVerify;
-            //_GhostQuerier.QueryNotifier<IVerify2>().Supply += _SupplyVerify2;
         }
 
         void IBootable.Shutdown()
@@ -59,14 +53,12 @@ namespace Console
 
         private void _SupplyVerify(IVerify obj)
         {
-            
-            //_Command.Register<string,string>("LoginA [arg1,arg2]", _LoginA);
-            _Command.RegisterLambda<Visual,string, string>(this , (instnace , arg1,arg2) => instnace._LoginA(arg1,arg2));
-            _Command.Register("Login []", ()=>_Login(obj));
+            _Command.RegisterLambda<Visual, string, string>(this, (instance, arg1, arg2) => instance._LoginA(arg1, arg2));
+
+            _Command.Register("Login []", () => _Login(obj));
         }
 
-
-        void _LoginA(string a ,string b)
+        private void _LoginA(string a, string b)
         {
             
         }

@@ -339,7 +339,7 @@ namespace Synchronization
         {
             if(_GhostInterfaceProvider.Find(ghost_base_type) == null)
             {
-                var ghostType = new AssemblyBuilder().Build(ghost_base_type);
+                var ghostType = new AssemblyBuilder().Build(ghost_base_type, typeof(IGhost).Assembly.Location);
 
                 _GhostInterfaceProvider.Add(ghost_base_type, ghostType);
             }

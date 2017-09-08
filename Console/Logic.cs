@@ -2,47 +2,42 @@
 
 using Library.Framework;
 using Library.Synchronize;
-using Library.Utility;
+
+using Regulus.Utility;
 
 using Synchronization;
+
+using IUpdatable = Library.Utility.IUpdatable;
 
 namespace Console
 {
     internal class Logic : IUpdatable, IVerify, IVerify2
     {
         private readonly ISoulBinder _Binder;
-        private Regulus.Utility.Command _Command;
-        private Regulus.Utility.Console.IViewer _Viewer;
 
-     //   private readonly Move _Move;
+        private Command _Command;
+
+        private readonly Regulus.Utility.Console.IViewer _Viewer;
 
         public Logic(
             ISoulBinder binder,
-            Regulus.Utility.Command command,
+            Command command,
             Regulus.Utility.Console.IViewer viewer)
         {
-         //   _Move = new Move();
             _Binder = binder;
             _Command = command;
             _Viewer = viewer;
-
-            _Viewer.WriteLine("\nTerry Test");
         }
 
         void IBootable.Launch()
         {
-            //_Command.Register("Verify", () => { _Binder.Bind<IVerify>(this); });
-         
-            //   _Binder.Bind<IMove>(_Move);
+            _Viewer.WriteLine("\nTerry Test");
 
-            //_Binder.Bind<IVerify2>(this);
             _Binder.Bind<IVerify>(this);
         }
 
         void IBootable.Shutdown()
         {
-           // _Binder.Unbind<IMove>(_Move);
-            _Binder.Unbind<IVerify2>(this);
             _Binder.Unbind<IVerify>(this);
         }
 
