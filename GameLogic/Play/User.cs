@@ -6,9 +6,9 @@ using Library.Framework;
 using Library.Game;
 using Library.Utility;
 
-using Synchronization;
+using Synchronization.Interface;
 
-namespace GameLogic
+namespace GameLogic.Play
 {
     public class User : IUser, IAccountStatus
     {

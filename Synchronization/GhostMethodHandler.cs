@@ -2,6 +2,9 @@ using System.Reflection;
 
 using Library.Synchronize;
 
+using Synchronization.Data;
+using Synchronization.Interface;
+
 namespace Synchronization
 {
     public class GhostMethodHandler
@@ -33,7 +36,7 @@ namespace Synchronization
                 package.ReturnId = _ReturnValueQueue.PushReturnValue(return_value);
             }
 
-            _Requester.Request(ClientToServerOpCode.CALL_METHOD, package);
+            _Requester.Request(ClientToServerOpCode.CallMethod, package);
         }
     }
 }

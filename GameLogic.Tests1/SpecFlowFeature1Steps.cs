@@ -1,12 +1,11 @@
-﻿using System;
+﻿using NSubstitute;
+
+using NUnit.Framework;
+
 using TechTalk.SpecFlow;
 
-namespace Input.Tests1
+namespace GameLogic.Tests1
 {
-    using NSubstitute;
-
-    using NUnit.Framework;
-
     [Binding]
     public class SpecFlowFeature1Steps
     {

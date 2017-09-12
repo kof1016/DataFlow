@@ -1,6 +1,6 @@
 using System;
 
-namespace Synchronization
+namespace Synchronization.PreGenerated
 {
     public delegate void InvokeEventCallback(Guid entity_id, string event_name, object[] args);
 

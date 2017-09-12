@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Synchronization.Data;
 
-namespace Synchronization
+namespace Synchronization.Interface
 {
     public interface IResponseQueue
     {

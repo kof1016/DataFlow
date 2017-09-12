@@ -5,6 +5,7 @@ using Library.Framework;
 using Regulus.Utility;
 
 using Synchronization;
+using Synchronization.Interface;
 
 using IUpdatable = Library.Utility.IUpdatable;
 

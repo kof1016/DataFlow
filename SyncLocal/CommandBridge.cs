@@ -1,6 +1,8 @@
 ﻿using System;
 
 using Synchronization;
+using Synchronization.Data;
+using Synchronization.Interface;
 
 namespace SyncLocal
 {

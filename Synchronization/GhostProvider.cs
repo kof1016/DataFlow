@@ -8,6 +8,9 @@ using Library.Synchronize;
 using Library.TypeHelper;
 using Library.Utility;
 
+using Synchronization.Data;
+using Synchronization.Interface;
+
 namespace Synchronization
 {
     public class GhostProvider
@@ -78,7 +81,7 @@ namespace Synchronization
         {
             switch(id)
             {
-                case ServerToClientOpCode.PING:
+                case ServerToClientOpCode.Ping:
                     Ping = _PingTimeCounter.Ticks;
                     _StartPing();
                     break;
@@ -382,7 +385,7 @@ namespace Synchronization
                 if(_PingTimer != null)
                 {
                     _PingTimeCounter = new TimeCounter();
-                    _Requester.Request(ClientToServerOpCode.PING, new byte[0]);
+                    _Requester.Request(ClientToServerOpCode.Ping, new byte[0]);
                 }
             }
 

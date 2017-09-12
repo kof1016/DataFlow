@@ -4,6 +4,9 @@ using System.Linq;
 
 using Library.Synchronize;
 
+using Synchronization.Data;
+using Synchronization.Interface;
+
 namespace Synchronization
 {
     public class AutoRelease
@@ -51,7 +54,7 @@ namespace Synchronization
                                };
 
                 // TODO:
-                _Requester.Request(ClientToServerOpCode.RELEASE, null);
+                _Requester.Request(ClientToServerOpCode.Release, null);
             }
         }
     }

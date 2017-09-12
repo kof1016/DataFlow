@@ -1,4 +1,4 @@
-﻿namespace Input.Tests1
+﻿namespace GameLogic.Tests1
 {
     public interface ICalculator
     {

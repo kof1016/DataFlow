@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Synchronization
+namespace Synchronization.Interface
 {
     public interface ISoulBinder
     {

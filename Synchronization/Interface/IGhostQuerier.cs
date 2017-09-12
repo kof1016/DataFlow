@@ -3,7 +3,7 @@
 using Library.Synchronize;
 using Library.Utility;
 
-namespace Synchronization
+namespace Synchronization.Interface
 {
     public interface IGhostQuerier : IUpdatable
     {

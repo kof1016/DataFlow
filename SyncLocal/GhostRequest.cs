@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 
 using Synchronization;
+using Synchronization.Data;
+using Synchronization.Interface;
 
 namespace SyncLocal
 {
@@ -55,17 +57,17 @@ namespace SyncLocal
         {
             switch(code)
             {
-                case ClientToServerOpCode.PING:
+                case ClientToServerOpCode.Ping:
                     OnPingEvent?.Invoke();
                     break;
-                case ClientToServerOpCode.CALL_METHOD:
+                case ClientToServerOpCode.CallMethod:
                     {
                         var pkg = arg as PackageCallMethod;
                         OnCallMethodEvent?.Invoke(pkg.EntityId, pkg.MethodName, pkg.ReturnId, pkg.MethodParams);
                     }
 
                     break;
-                case ClientToServerOpCode.RELEASE:
+                case ClientToServerOpCode.Release:
                     {
                         var pkg = arg as PackageRelease;
                         OnReleaseEvent?.Invoke(pkg.EntityId);

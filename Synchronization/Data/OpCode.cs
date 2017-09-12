@@ -1,12 +1,12 @@
-﻿namespace Synchronization
+﻿namespace Synchronization.Data
 {
     public enum ClientToServerOpCode
     {
-        CALL_METHOD = 1,
+        CallMethod = 1,
 
-        PING,
+        Ping,
 
-        RELEASE
+        Release
     }
 
     public enum ServerToClientOpCode
@@ -23,14 +23,10 @@
 
         LoadSoulCompile,
 
-        PING,
+        Ping,
 
         ErrorMethod,
 
         ProtocolSubmit
     }
-}
-
-
-
-    
+}  

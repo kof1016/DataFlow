@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Synchronization
+namespace Synchronization.Interface
 {
     public delegate void InvokeMethodCallback(Guid entity_id, string method_name, Guid return_id, object[] args);
 

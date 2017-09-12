@@ -1,6 +1,6 @@
 using System;
 
-namespace Synchronization
+namespace Synchronization.Data
 {
     public class RequestPackage
     {

@@ -4,7 +4,7 @@ using System.Reflection;
 
 using Library.TypeHelper;
 
-namespace Synchronization
+namespace Synchronization.PreGenerated
 {
     public class MemberMap : IEqualityComparer<Type>, IEqualityComparer<PropertyInfo>, IEqualityComparer<EventInfo>, IEqualityComparer<MethodInfo>, IEqualityComparer<int>
     {

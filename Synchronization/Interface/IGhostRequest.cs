@@ -1,4 +1,6 @@
-﻿namespace Synchronization
+﻿using Synchronization.Data;
+
+namespace Synchronization.Interface
 {
     public interface IGhostRequest
     {

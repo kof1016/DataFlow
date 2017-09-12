@@ -5,6 +5,7 @@ using Library.Game;
 using Library.Utility;
 
 using Synchronization;
+using Synchronization.Interface;
 
 namespace GameLogic.Play
 {

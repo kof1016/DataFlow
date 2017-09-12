@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Synchronization
+using Synchronization.Interface;
+
+namespace Synchronization.PreGenerated
 {
     public class EventProvider
     {

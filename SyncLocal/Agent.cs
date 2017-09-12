@@ -5,6 +5,8 @@ using Library.Synchronize;
 using Library.Utility;
 
 using Synchronization;
+using Synchronization.Data;
+using Synchronization.Interface;
 
 namespace SyncLocal
 {
@@ -184,7 +186,7 @@ namespace SyncLocal
 
         private void _OnRequestPing()
         {
-            _GhostProvider.OnResponse(ServerToClientOpCode.PING, new object[0]);
+            _GhostProvider.OnResponse(ServerToClientOpCode.Ping, new object[0]);
         }
     }
 }

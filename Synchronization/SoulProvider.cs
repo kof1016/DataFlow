@@ -5,6 +5,10 @@ using System.Reflection;
 
 using Library.Synchronize;
 
+using Synchronization.Data;
+using Synchronization.Interface;
+using Synchronization.PreGenerated;
+
 namespace Synchronization
 {
     public class SoulProvider : IDisposable, ISoulBinder

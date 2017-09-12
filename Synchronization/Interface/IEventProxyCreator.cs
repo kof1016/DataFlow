@@ -1,6 +1,8 @@
 using System;
 
-namespace Synchronization
+using Synchronization.PreGenerated;
+
+namespace Synchronization.Interface
 {
     public interface IEventProxyCreator
     {

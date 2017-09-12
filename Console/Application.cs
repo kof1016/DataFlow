@@ -1,6 +1,7 @@
 ﻿using Regulus.Utility;
 
 using Synchronization;
+using Synchronization.Interface;
 
 using SyncLocal;
 
