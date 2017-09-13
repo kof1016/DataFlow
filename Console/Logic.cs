@@ -8,11 +8,13 @@ using Regulus.Utility;
 using Synchronization;
 using Synchronization.Interface;
 
+using SyncLocal;
+
 using IUpdatable = Library.Utility.IUpdatable;
 
 namespace Console
 {
-    internal class Logic : IUpdatable, IVerify, IVerify2
+    internal class Logic : IUpdatable, IVerify
     {
         private readonly ISoulBinder _Binder;
 
@@ -49,12 +51,12 @@ namespace Console
 
         Value<bool> IVerify.Login(string id, string password)
         {
-            return true;
-        }
+            //var val = Agent.Connect(ip, port);
+            //val.OnValue += _ConnectResult;
+            //return val;
+            _Viewer.WriteLine($"logic 收到 id = {id} password = {password}");
 
-        Value<bool> IVerify2.Login(string id, string password)
-        {
-            return true;
+            return new Value<bool>();
         }
     }
 }

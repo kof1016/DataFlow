@@ -46,11 +46,12 @@ namespace SyncLocal
 
             Binder = _SoulProvider;
             GhostQuerier = this;
+            _Launch();
         }
 
         void IBootable.Launch()
         {
-            _Launch();
+            //_Launch();
         }
 
         void IBootable.Shutdown()

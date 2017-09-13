@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RegulusLibrary">
+      <HintPath>.\RegulusLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="RegulusRemoting">
+      <HintPath>.\RegulusRemoting.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,10 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
+    <Compile Include="CommandPackage.cs" />
     <Compile Include="IAccountFinder.cs" />
     <Compile Include="IAccountStatus.cs" />
+    <Compile Include="IConnect.cs" />
     <Compile Include="IMove.cs" />
+    <Compile Include="Moba.cs" />
     <Compile Include="IVerify.cs" />
+    <Compile Include="PlayerRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

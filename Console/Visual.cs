@@ -1,6 +1,7 @@
 ﻿using DataDefine;
 
 using Library.Framework;
+using Library.Synchronize;
 
 using Regulus.Utility;
 
@@ -44,37 +45,34 @@ namespace Console
         private void _Shutdown()
         {
             _GhostQuerier.QueryNotifier<IVerify>().Supply -= _SupplyVerify;
-            _GhostQuerier.QueryNotifier<IVerify2>().Supply -= _SupplyVerify2;
-        }
-
-        private void _SupplyVerify2(IVerify2 obj)
-        {
-            var result = obj.Login("1", "1");
         }
 
         private void _SupplyVerify(IVerify obj)
         {
-            _Command.RegisterLambda<Visual, string, string>(this, (instance, arg1, arg2) => instance._LoginA(arg1, arg2));
+            // 直接呼叫
+            //            var result = obj.Login("1", "1");
+            //            result.OnValueEvent += (t) => { _Viewer.WriteLine($"回傳{t}"); };
 
-            _Command.Register("Login []", () => _Login(obj));
+
+            // command 使用方法1
+            _Command.Register<string, string>(
+                "m [a1, a2]", 
+                (a1, a2) => { obj.Login(a1, a2); });
+
+
+
+
+            // command 使用方法2
+                        _Command.RegisterLambda<IVerify, string, string, Value<bool>>
+                            (
+                            obj, 
+                            (instance, a1, a2) => instance.Login(a1, a2),
+                            result => { _Viewer.WriteLine($"回傳{result}");});
         }
 
-        private void _LoginA(string a, string b)
+        private void Result_OnValueEvent(bool obj)
         {
-            
-        }
-        
-
-        private void _Login(IVerify obj)
-        {
-            var result = obj.Login("1", "1");
-            result.OnValueEvent += res =>
-                {
-                    if (res)
-                    {
-                        // login ok
-                    }
-                };
+            throw new System.NotImplementedException();
         }
 
         bool IUpdatable.Update()
