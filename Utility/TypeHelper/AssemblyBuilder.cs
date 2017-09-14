@@ -47,7 +47,7 @@ namespace Library.TypeHelper
         // throw new Exception("Gpi compile error");
         // }
         // }
-        public Type Build(Type base_type, string path)
+        public Type Build(Type base_type, string library_path, string synchronization_path)
         {
             var optionsDic = new Dictionary<string, string>
                                  {
@@ -65,7 +65,8 @@ namespace Library.TypeHelper
                                       {
                                           "System.Core.dll",
                                           "System.xml.dll",
-                                          path,
+                                          library_path,
+                                          synchronization_path,
                                           base_type.Assembly.Location
                                       },
                                   TempFiles = new TempFileCollection()

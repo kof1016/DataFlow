@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RegulusLibrary">
+      <HintPath>..\packages\RegulusLibrary.0.3.0\lib\net35\RegulusLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Play\Center.cs" />
+    <Compile Include="Play\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Play\User.cs" />
     <Compile Include="Verify.cs" />
@@ -55,6 +59,10 @@
     <ProjectReference Include="..\Synchronization\Synchronization.csproj">
       <Project>{71b3c1bc-00cb-4994-9775-f8b940c81cca}</Project>
       <Name>Synchronization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SyncLocal\SyncLocal.csproj">
+      <Project>{8050fa1d-c949-4f99-84bc-c498993c7a30}</Project>
+      <Name>SyncLocal</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utility\Library.csproj">
       <Project>{d62013ba-4663-4657-9fba-97d6b1776f3c}</Project>

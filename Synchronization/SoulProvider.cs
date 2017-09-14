@@ -13,7 +13,7 @@ namespace Synchronization
 {
     public class SoulProvider : IDisposable, ISoulBinder
     {
-        private readonly Queue<object[]> _EventFilter = new Queue<object[]>();
+        private readonly Queue<object> _EventFilter = new Queue<object>();
 
         private readonly IRequestQueue _Peer;
 
@@ -288,9 +288,10 @@ namespace Synchronization
 
         private Delegate _BuildDelegate(EventInfo event_info, Guid new_soul_id, InvokeEventCallback invoke)
         {
-            var raiseMethod = event_info.GetRaiseMethod();
-            var parameterInfos = raiseMethod.GetParameters();
-            var argTypes = parameterInfos.Select(p => p.ParameterType).ToArray();
+            
+
+            var parameterInfos = event_info.EventHandlerType.GetGenericArguments();
+            var argTypes = parameterInfos.Select(p => p).ToArray();
 
             Type[] genericEventClosureTypes =
                 {
@@ -304,9 +305,9 @@ namespace Synchronization
 
             var type = genericEventClosureTypes[argTypes.Length].MakeGenericType(argTypes);
 
-            var instance = Activator.CreateInstance(type, new_soul_id, raiseMethod.Name, invoke);
+            var instance = Activator.CreateInstance(type, new_soul_id, event_info.Name , invoke);
 
-            var actionType = type.GetMethod("GetDelegateType").Invoke(instance, new object[0]) as Type;
+            var actionType = type.GetMethod(nameof(GenericEventClosure.GetDelegateType)).Invoke(instance, new object[0]) as Type;
 
             return Delegate.CreateDelegate(actionType, instance, "Run", true);
 
@@ -332,7 +333,7 @@ namespace Synchronization
 
             lock(_EventFilter)
             {
-                _EventFilter.Enqueue(package.EventParams);
+                _EventFilter.Enqueue(package);
             }
         }
 

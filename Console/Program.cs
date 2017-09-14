@@ -1,4 +1,5 @@
-﻿using System.Runtime.Hosting;
+﻿using System;
+using System.Runtime.Hosting;
 
 using Regulus.Utility.WindowConsoleAppliction;
 
@@ -16,4 +17,6 @@ namespace Console
             // center.Update();
         }
     }
+
+    
 }

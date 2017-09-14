@@ -5,7 +5,16 @@ using Library.Utility;
 
 namespace Synchronization.Interface
 {
-    public interface IGhostQuerier : IUpdatable
+    public interface IGhostQuerier
+    {
+        /// <summary>
+        ///     查詢介面物件通知者
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        INotifier<T> QueryNotifier<T>();
+    }
+    public interface IAgent : IUpdatable, IGhostQuerier
     {
         /// <summary>
         ///     與遠端發生斷線
@@ -48,12 +57,7 @@ namespace Synchronization.Interface
         /// </summary>
         bool Connected { get; }
 
-        /// <summary>
-        ///     查詢介面物件通知者
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        INotifier<T> QueryNotifier<T>();
+        
 
         /// <summary>
         ///     連線

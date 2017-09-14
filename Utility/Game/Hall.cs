@@ -5,7 +5,7 @@ namespace Library.Game
 {
     public class Hall : IUpdatable
     {
-        public event OnNewUser OnNewUserEvent;
+        public event NewUser OnNewUserEvent;
 
         private readonly Updater _Users;
 

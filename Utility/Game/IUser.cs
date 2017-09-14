@@ -4,17 +4,17 @@ using Library.Utility;
 
 namespace Library.Game
 {
-    public delegate void OnNewUser(Guid account);
+    public delegate void NewUser(Guid account);
 
-    public delegate void OnQuit();
+    public delegate void Quit();
 
     public delegate void DoneCallback();
 
     public interface IUser : IUpdatable
     {
-        event OnQuit OnQuitEvent;
+        event Quit OnQuitEvent;
 
-        event OnNewUser OnVerifySuccessEvent;
+        event NewUser OnVerifySuccessEvent;
 
         void OnKick(Guid id);
     }

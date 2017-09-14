@@ -268,7 +268,7 @@ namespace Library.Utility
     
             namespace {nameSpace}.Event.{name} 
             {{ 
-                public class {eventName} : Synchronization.IEventProxyCreator
+                public class {eventName} : Synchronization.Interface.IEventProxyCreator
                 {{
                     Type _Type;
                     string _Name;
@@ -280,18 +280,18 @@ namespace Library.Utility
             
                     }}
     
-                    Delegate Regulus.Synchronization.IEventProxyCreator.Create(Guid soul_id, int event_id, Synchronization.InvokeEventCallback invoke_event)
+                    Delegate Synchronization.Interface.IEventProxyCreator.Create(Guid soul_id, string event_id, Synchronization.PreGenerated.InvokeEventCallback invoke_event)
                     {{                
-                        var closure = new Synchronization.GenericEventClosure{_GetTypes(argTypes)}(soul_id, event_id, invoke_event);                
+                        var closure = new Synchronization.PreGenerated.GenericEventClosure{_GetTypes(argTypes)}(soul_id, event_id, invoke_event);                
                         return new Action{_GetTypes(argTypes)}(closure.Run);
                     }}
         
-                    Type Synchronization.IEventProxyCreator.GetType()
+                    Type Synchronization.Interface.IEventProxyCreator.GetType()
                     {{
                         return _Type;
                     }}            
 
-                    string Synchronization.IEventProxyCreator.GetName()
+                    string Synchronization.Interface.IEventProxyCreator.GetName()
                     {{
                         return _Name;
                     }}            

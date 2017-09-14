@@ -1,4 +1,8 @@
-﻿using DataDefine;
+﻿using System;
+
+using DataDefine;
+
+using GameLogic.Play;
 
 using Library.Framework;
 using Library.Synchronize;
@@ -8,19 +12,19 @@ using Regulus.Utility;
 using Synchronization;
 using Synchronization.Interface;
 
-using SyncLocal;
-
 using IUpdatable = Library.Utility.IUpdatable;
 
 namespace Console
 {
-    internal class Logic : IUpdatable, IVerify
+    internal class Logic : IUpdatable, IVerify, IPlayer
     {
         private readonly ISoulBinder _Binder;
 
         private Command _Command;
 
         private readonly Regulus.Utility.Console.IViewer _Viewer;
+
+        private Center _Center;
 
         public Logic(
             ISoulBinder binder,
@@ -37,6 +41,9 @@ namespace Console
             _Viewer.WriteLine("\nTerry Test");
 
             _Binder.Bind<IVerify>(this);
+
+            _Binder.Bind<IPlayer>(this);
+
         }
 
         void IBootable.Shutdown()
@@ -51,12 +58,17 @@ namespace Console
 
         Value<bool> IVerify.Login(string id, string password)
         {
-            //var val = Agent.Connect(ip, port);
-            //val.OnValue += _ConnectResult;
-            //return val;
             _Viewer.WriteLine($"logic 收到 id = {id} password = {password}");
 
-            return new Value<bool>();
+            var returnValue = new Value<bool>();
+
+            var result = id == "1" && password == "1";
+
+            returnValue.SetValue(result);
+
+            return returnValue;
         }
+
+        public event Action<Move> MoveEvent;
     }
 }

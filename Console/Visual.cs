@@ -1,4 +1,7 @@
-﻿using DataDefine;
+﻿using System;
+using System.CodeDom;
+
+using DataDefine;
 
 using Library.Framework;
 using Library.Synchronize;
@@ -55,25 +58,45 @@ namespace Console
 
 
             // command 使用方法1
-            _Command.Register<string, string>(
-                "m [a1, a2]", 
-                (a1, a2) => { obj.Login(a1, a2); });
-
-
-
+//            _Command.Register<string, string>(
+//                "m [a1, a2]", 
+//                (a1, a2) => { obj.Login(a1, a2); });
 
             // command 使用方法2
-                        _Command.RegisterLambda<IVerify, string, string, Value<bool>>
-                            (
-                            obj, 
-                            (instance, a1, a2) => instance.Login(a1, a2),
-                            result => { _Viewer.WriteLine($"回傳{result}");});
+
+
+            _Command.RegisterLambda<IVerify, string, string, Value<bool>>
+                    (obj,
+                     (instance, a1, a2) => instance.Login(a1, a2),
+                     _ReturnValue);
         }
 
-        private void Result_OnValueEvent(bool obj)
+        private void _ReturnValue(Value<bool> return_value)
         {
-            throw new System.NotImplementedException();
+            return_value.OnValueEvent += result =>
+                {
+                    _Viewer.WriteLine("==Visual Show==");
+
+                    _Viewer.WriteLine($"Login result = {result}");
+                };
         }
+
+        private void Instance_OnMoveEvent(string arg1, string arg2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Instance_OnMoveEvent2()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void _ReturnValuePlayer(Action obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        
 
         bool IUpdatable.Update()
         {

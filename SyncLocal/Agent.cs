@@ -10,15 +10,11 @@ using Synchronization.Interface;
 
 namespace SyncLocal
 {
-    public class Agent : ISoulBinder, IGhostQuerier
+    public class Agent : ISoulBinder, IGhostQuerier , IUpdatable
     {
         public delegate void ConnectedCallback();
 
-        private event Action _OnConnectEvent;
-
-        private event Action<string, string> _OnErrorMethodEvent;
-
-        private event Action<string, string> _OnErrorVerifyEvent;
+        
 
         public event ConnectedCallback OnConnectedEvent;
 
@@ -66,50 +62,7 @@ namespace SyncLocal
             return true;
         }
 
-        event Action IGhostQuerier.BreakEvent
-        {
-            add => _CommandBridge.RequestQueue.OnBreakEvent += value;
-            remove => _CommandBridge.RequestQueue.OnBreakEvent -= value;
-        }
-
-        event Action IGhostQuerier.ConnectEvent
-        {
-            add => _OnConnectEvent += value;
-            remove => _OnConnectEvent += value;
-        }
-
-        event Action<string, string> IGhostQuerier.ErrorMethodEvent
-        {
-            add => _OnErrorMethodEvent += value;
-            remove => _OnErrorMethodEvent -= value;
-        }
-
-        event Action<string, string> IGhostQuerier.ErrorVerifyEvent
-        {
-            add => _OnErrorVerifyEvent += value;
-            remove => _OnErrorVerifyEvent -= value;
-        }
-
-        long IGhostQuerier.Ping => _GhostProvider.Ping;
-
-        bool IGhostQuerier.Connected => _Connected;
-
-        INotifier<T> IGhostQuerier.QueryNotifier<T>()
-        {
-            return _QueryProvider<T>();
-        }
-
-        void IGhostQuerier.Disconnect()
-        {
-            _Shutdown();
-        }
-
-        Value<bool> IGhostQuerier.Connect(string ip_address, int password)
-        {
-            OnConnectedEvent();
-            _Connected = true;
-            return true;
-        }
+        
 
         event Action ISoulBinder.OnBreakEvent
         {
@@ -160,8 +113,7 @@ namespace SyncLocal
            // _GhostRequest.OnPingEvent += _OnRequestPing;
             _GhostRequest.OnReleaseEvent += _SoulProvider.Unbind;
 
-            _GhostProvider.OnErrorMethodEvent += _OnErrorMethodEvent;
-            _GhostProvider.OnErrorVerifyEvent += _OnErrorVerifyEvent;
+            
             _GhostProvider.Initial(_GhostRequest);
         }
 
@@ -173,7 +125,7 @@ namespace SyncLocal
         private void _Shutdown()
         {
             // _GhostProvider.OnErrorVerifyEvent -= _OnErrorVerifyEvent;
-            _GhostProvider.OnErrorMethodEvent -= _OnErrorMethodEvent;
+            
 
             _Connected = false;
 
@@ -188,6 +140,11 @@ namespace SyncLocal
         private void _OnRequestPing()
         {
             _GhostProvider.OnResponse(ServerToClientOpCode.Ping, new object[0]);
+        }
+
+        INotifier<T> IGhostQuerier.QueryNotifier<T>()
+        {
+            return _QueryProvider<T>();
         }
     }
 }

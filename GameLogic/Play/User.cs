@@ -8,15 +8,17 @@ using Library.Utility;
 
 using Synchronization.Interface;
 
+using IUser = Library.Game.IUser;
+
 namespace GameLogic.Play
 {
     public class User : IUser, IAccountStatus
     {
         private event Action _OnKickEvent;
 
-        private event OnQuit _OnQuitEvent;
+        private event Quit _OnQuitEvent;
 
-        private event OnNewUser _OnVerifySuccessEvent;
+        private event NewUser _OnVerifySuccessEvent;
 
         private readonly IAccountFinder _AccountFinder;
 
@@ -40,13 +42,13 @@ namespace GameLogic.Play
             remove => _OnKickEvent -= value;
         }
 
-        event OnNewUser IUser.OnVerifySuccessEvent
+        event NewUser IUser.OnVerifySuccessEvent
         {
             add => _OnVerifySuccessEvent += value;
             remove => _OnVerifySuccessEvent -= value;
         }
 
-        event OnQuit IUser.OnQuitEvent
+        event Quit IUser.OnQuitEvent
         {
             add => _OnQuitEvent += value;
             remove => _OnQuitEvent -= value;

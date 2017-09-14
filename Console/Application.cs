@@ -17,16 +17,18 @@ namespace Console
 
         private readonly Updater _Updater = new Updater();
 
+        private readonly Agent _Agent;
         public Application()
         {
             var agent = new Agent();
             _GhostQuerier = agent.GhostQuerier; // client
             _Binder = agent.Binder; // server
+            _Agent = agent;
         }
 
         protected override void _Launch()
         {
-            _Updater.Add(_GhostQuerier);
+            _Updater.Add(_Agent);
             _Updater.Add(new Logic(_Binder, Command, Viewer));
             _Updater.Add(new Visual(_GhostQuerier, Command, Viewer));
         }
