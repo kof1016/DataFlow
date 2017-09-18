@@ -5,7 +5,6 @@ using Library.Synchronize;
 using Library.Utility;
 
 using Synchronization;
-using Synchronization.Data;
 using Synchronization.Interface;
 
 namespace SyncLocal
@@ -121,11 +120,6 @@ namespace SyncLocal
             _GhostProvider.Finial();
 
             _GhostRequest.OnReleaseEvent -= _SoulProvider.Unbind;
-        }
-
-        private void _OnRequestPing()
-        {
-            _GhostProvider.OnResponse(ServerToClientOpCode.Ping, new object[0]);
         }
     }
 }

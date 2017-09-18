@@ -29,7 +29,7 @@ namespace Console
         protected override void _Launch()
         {
             _Updater.Add(_Agent);
-            _Updater.Add(new Logic(_Binder, Command, Viewer));
+            _Updater.Add(new Logic(_Binder, Viewer));
             _Updater.Add(new Visual(_GhostQuerier, Command, Viewer));
         }
 

@@ -2,38 +2,40 @@
 
 using DataDefine;
 
-using GameLogic.Play;
-
 using Library.Framework;
 using Library.Synchronize;
+using Library.Utility;
 
-using Regulus.Utility;
-
-using Synchronization;
 using Synchronization.Interface;
-
-using IUpdatable = Library.Utility.IUpdatable;
 
 namespace Console
 {
     internal class Logic : IUpdatable, IVerify, IPlayer
     {
-        private readonly ISoulBinder _Binder;
+        private event Action<Move> OnMoveEvent;
 
-        private Command _Command;
+        private readonly ISoulBinder _Binder;
 
         private readonly Regulus.Utility.Console.IViewer _Viewer;
 
-       private Center _Center;
-
+        // private Center _Center;
         public Logic(
             ISoulBinder binder,
-            Command command,
             Regulus.Utility.Console.IViewer viewer)
         {
             _Binder = binder;
-            _Command = command;
             _Viewer = viewer;
+        }
+
+        Value<bool> IPlayer.IsMain()
+        {
+            return new Value<bool>(true);
+        }
+
+        event Action<Move> IPlayer.MoveEvent
+        {
+            add => OnMoveEvent += value;
+            remove => OnMoveEvent -= value;
         }
 
         void IBootable.Launch()
@@ -43,7 +45,6 @@ namespace Console
             _Binder.Bind<IVerify>(this);
 
             _Binder.Bind<IPlayer>(this);
-
         }
 
         void IBootable.Shutdown()
@@ -68,19 +69,5 @@ namespace Console
 
             return returnValue;
         }
-
-        public bool Main { get; }
-
-        public bool IsMain()
-        {
-            throw new NotImplementedException();
-        }
-
-        Value<bool> IPlayer.IsMain()
-        {
-            throw new NotImplementedException();
-        }
-
-        public event Action<Move> MoveEvent;
     }
 }

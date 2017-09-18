@@ -17,8 +17,6 @@ namespace Synchronization
     {
         public event Action<string, string> OnErrorMethodEvent;
 
-        public event Action<string, string> OnErrorVerifyEvent;
-
         private readonly AutoRelease _AutoRelease;
 
         private readonly GhostInterfaceProvider _GhostInterfaceProvider;
@@ -95,7 +93,6 @@ namespace Synchronization
                         }
 
                         _UpdateProperty(data.PropertyName, data.EntityId, data.Arg);
-                        
                     }
 
                     break;
@@ -179,6 +176,7 @@ namespace Synchronization
                         {
                             throw new NullReferenceException("PackageProtocolSubmit cast null");
                         }
+                        
                         // _ProtocolSubmit(data);
                     }
 
@@ -275,17 +273,14 @@ namespace Synchronization
         {
             var provider = _QueryServerProvider(type_name);
 
-            if(provider != null)
-            {
-                provider.Remove(id);
-            }
+            provider?.Remove(id);
         }
 
         private IGhost _BuildGhostInstance(Type ghost_base_type, Guid id, bool return_type)
         {
             if(ghost_base_type == null)
             {
-                throw new ArgumentNullException("ghost_base_type null plz check dll loader !!");
+                throw new ArgumentNullException($"ghost_base_type null plz check dll loader !!");
             }
 
             var ghostType = _QueryGhostType(ghost_base_type);
@@ -361,13 +356,13 @@ namespace Synchronization
 
             var eventInfos = type.GetField("_" + event_name, BindingFlags.Instance | BindingFlags.NonPublic);
 
-            var fieldValue = eventInfos.GetValue(instance);
+            var fieldValue = eventInfos?.GetValue(instance);
 
             var fieldValueDelegate = fieldValue as Delegate;
 
             try
             {
-                fieldValueDelegate.DynamicInvoke(event_params);
+                fieldValueDelegate?.DynamicInvoke(event_params);
             }
             catch(TargetInvocationException tie)
             {
@@ -381,12 +376,14 @@ namespace Synchronization
 
         private Type _QueryGhostType(Type ghost_base_type)
         {
-            if(_GhostInterfaceProvider.Find(ghost_base_type) == null)
+            if(_GhostInterfaceProvider.Find(ghost_base_type) != null)
             {
-                var ghostType = new AssemblyBuilder().Build(ghost_base_type, typeof(IGhost).Assembly.Location, typeof(IEventProxyCreator).Assembly.Location);
-
-                _GhostInterfaceProvider.Add(ghost_base_type, ghostType);
+                return _GhostInterfaceProvider.Find(ghost_base_type);
             }
+
+            var ghostType = new AssemblyBuilder().Build(ghost_base_type, typeof(IGhost).Assembly.Location, typeof(IEventProxyCreator).Assembly.Location);
+
+            _GhostInterfaceProvider.Add(ghost_base_type, ghostType);
 
             return _GhostInterfaceProvider.Find(ghost_base_type);
         }
@@ -437,11 +434,13 @@ namespace Synchronization
         {
             lock(_Sync)
             {
-                if(_PingTimer != null)
+                if(_PingTimer == null)
                 {
-                    _PingTimer.Stop();
-                    _PingTimer = null;
+                    return;
                 }
+
+                _PingTimer.Stop();
+                _PingTimer = null;
             }
         }
     }
