@@ -57,7 +57,7 @@ namespace GameLogic.Play
         public void JoinPlayer(Guid id, int character, bool main_player)
         {
             
-            var player = new Player(_Binder, id, character);
+            var player = new Player(_Binder, id, character , main_player);
 
             _Players.Add(player);
 

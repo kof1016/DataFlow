@@ -18,7 +18,9 @@ namespace GameLogic.Play
 
         public readonly int Character;
 
-        public readonly bool MainPlayer;
+        private readonly bool _MainPlayer;
+
+        
 
         private float _PositionX;
 
@@ -30,11 +32,12 @@ namespace GameLogic.Play
 
         private float _SpeedY;
 
-        public Player(ISoulBinder binder, Guid id, int character)
+        public Player(ISoulBinder binder, Guid id, int character, bool main_player)
         {
             _Binder = binder;
             Id = id;
             Character = character;
+            _MainPlayer = main_player;
             _Counter = new TimeCounter();
         }
 
@@ -62,6 +65,10 @@ namespace GameLogic.Play
 
         private event Action<Move> _MoveEvent;
 
+        Library.Synchronize.Value<bool>IPlayer.IsMain(){ 
+            return _MainPlayer;
+         }
+
         event Action<Move> IPlayer.MoveEvent
         {
             add
@@ -77,18 +84,22 @@ namespace GameLogic.Play
 
         public void Forward()
         {
-            _MoveEvent.Invoke(new Move(){ DirectionX = _SpeedX  , DirectionY = _SpeedY , StartPositionX = _PositionX , StartPositionY = _PositionY});
-
             _SpeedX = 1;
             _SpeedY = 0;
+
+
+            _MoveEvent.Invoke(new Move(){ DirectionX = _SpeedX  , DirectionY = _SpeedY , StartPositionX = _PositionX , StartPositionY = _PositionY});
+
+            
         }
 
         public void Stop()
         {
-            _MoveEvent.Invoke(new Move() { DirectionX = _SpeedX, DirectionY = _SpeedY, StartPositionX = _PositionX, StartPositionY = _PositionY });
-
             _SpeedX = 0;
             _SpeedY = 0;
+
+            _MoveEvent.Invoke(new Move() { DirectionX = _SpeedX, DirectionY = _SpeedY, StartPositionX = _PositionX, StartPositionY = _PositionY });
+            
         }
     }
 }

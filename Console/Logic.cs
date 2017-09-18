@@ -69,6 +69,18 @@ namespace Console
             return returnValue;
         }
 
+        public bool Main { get; }
+
+        public bool IsMain()
+        {
+            throw new NotImplementedException();
+        }
+
+        Value<bool> IPlayer.IsMain()
+        {
+            throw new NotImplementedException();
+        }
+
         public event Action<Move> MoveEvent;
     }
 }
