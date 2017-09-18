@@ -8,34 +8,29 @@ using Library.Utility;
 
 using Synchronization.Interface;
 
-using SyncLocal;
-
 namespace GameLogic.Play
 {
-    public class Center : IUpdatable , IInput
+    public class Center : IUpdatable, IInput
     {
         public event Action<string> OnMainPlayerOpCodeEvent; // TO INPUT
+
+        private readonly ISoulBinder _Binder;
 
         private readonly List<Player> _Players;
 
         private readonly Updater _Updater;
 
-        private readonly ISoulBinder _Binder;
-
-        
-
         public Center(ISoulBinder binder)
         {
             _Updater = new Updater();
             _Players = new List<Player>();
-            //var agent = new Agent();
 
-            
             _Binder = binder; // server
-            
+        }
 
-            //_Updater.Add(new Logic(_Center.Binder, _Viewer, _Connector));
-            //_Updater.Add(new Visual(_Center.GhostQuerier, _Command, _Viewer));
+        void IInput.OpCode(string opcode)
+        {
+            OnMainPlayerOpCodeEvent?.Invoke(opcode);
         }
 
         void IBootable.Launch()
@@ -56,8 +51,7 @@ namespace GameLogic.Play
 
         public void JoinPlayer(Guid id, int character, bool main_player)
         {
-            
-            var player = new Player(_Binder, id, character , main_player);
+            var player = new Player(_Binder, id, character, main_player);
 
             _Players.Add(player);
 
@@ -76,11 +70,6 @@ namespace GameLogic.Play
             {
                 plr.Stop();
             }
-        }
-
-        void IInput.OpCode(string opcode)
-        {
-            OnMainPlayerOpCodeEvent(opcode);
         }
     }
 }

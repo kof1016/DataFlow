@@ -1,18 +1,13 @@
-﻿using System;
-
-using Library.Utility;
-
-namespace DataDefine
+﻿namespace DataDefine
 {
-    
-
     public class Move
     {
-        public float StartPositionX;
-        public float StartPositionY;        
         public float DirectionX;
-        public float DirectionY;
-    }
 
-    
+        public float DirectionY;
+
+        public float StartPositionX;
+
+        public float StartPositionY;
+    }
 }

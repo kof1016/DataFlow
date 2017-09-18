@@ -3,6 +3,7 @@
 using DataDefine;
 
 using Library.Framework;
+using Library.Synchronize;
 using Library.Utility;
 
 using Synchronization.Interface;
@@ -11,22 +12,21 @@ namespace GameLogic.Play
 {
     public class Player : IUpdatable, IPlayer
     {
-        private TimeCounter _Counter;
+        private event Action<Move> _MoveEvent;
+
         private readonly ISoulBinder _Binder;
-
-        public readonly Guid Id;
-
-        public readonly int Character;
 
         private readonly bool _MainPlayer;
 
-        
+        public readonly int Character;
+
+        public readonly Guid Id;
+
+        private readonly TimeCounter _Counter;
 
         private float _PositionX;
 
         private float _PositionY;
-
-        
 
         private float _SpeedX;
 
@@ -41,16 +41,25 @@ namespace GameLogic.Play
             _Counter = new TimeCounter();
         }
 
+        Value<bool> IPlayer.IsMain()
+        {
+            return _MainPlayer;
+        }
+
+        event Action<Move> IPlayer.MoveEvent
+        {
+            add => _MoveEvent += value;
+            remove => _MoveEvent -= value;
+        }
+
         void IBootable.Launch()
         {
-            
             _Binder.Bind<IPlayer>(this);
         }
 
         void IBootable.Shutdown()
         {
             _Binder.Unbind<IPlayer>(this);
-            
         }
 
         bool IUpdatable.Update()
@@ -63,34 +72,19 @@ namespace GameLogic.Play
             return true;
         }
 
-        private event Action<Move> _MoveEvent;
-
-        Library.Synchronize.Value<bool>IPlayer.IsMain(){ 
-            return _MainPlayer;
-         }
-
-        event Action<Move> IPlayer.MoveEvent
-        {
-            add
-            {
-                this._MoveEvent += value;
-            }
-            remove
-            {
-                this._MoveEvent -= value;
-            }
-        }
-
-
         public void Forward()
         {
             _SpeedX = 1;
             _SpeedY = 0;
 
-
-            _MoveEvent.Invoke(new Move(){ DirectionX = _SpeedX  , DirectionY = _SpeedY , StartPositionX = _PositionX , StartPositionY = _PositionY});
-
-            
+            _MoveEvent.Invoke(
+                              new Move
+                                  {
+                                      DirectionX = _SpeedX,
+                                      DirectionY = _SpeedY,
+                                      StartPositionX = _PositionX,
+                                      StartPositionY = _PositionY
+                                  });
         }
 
         public void Stop()
@@ -98,8 +92,14 @@ namespace GameLogic.Play
             _SpeedX = 0;
             _SpeedY = 0;
 
-            _MoveEvent.Invoke(new Move() { DirectionX = _SpeedX, DirectionY = _SpeedY, StartPositionX = _PositionX, StartPositionY = _PositionY });
-            
+            _MoveEvent.Invoke(
+                              new Move
+                                  {
+                                      DirectionX = _SpeedX,
+                                      DirectionY = _SpeedY,
+                                      StartPositionX = _PositionX,
+                                      StartPositionY = _PositionY
+                                  });
         }
     }
 }

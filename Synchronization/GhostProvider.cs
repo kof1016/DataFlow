@@ -88,13 +88,25 @@ namespace Synchronization
                 case ServerToClientOpCode.UpdateProperty:
                     {
                         var data = arg as PackageUpdateProperty;
+
+                        if(data == null)
+                        {
+                            throw new NullReferenceException("PackageUpdateProperty cast null");
+                        }
+
                         _UpdateProperty(data.PropertyName, data.EntityId, data.Arg);
+                        
                     }
 
                     break;
                 case ServerToClientOpCode.InvokeEvent:
                     {
                         var data = arg as PackageInvokeEvent;
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageInvokeEvent cast null");
+                        }
+
                         _InvokeEvent(data.EntityId, data.EventName, data.EventParams);
                     }
 
@@ -102,6 +114,11 @@ namespace Synchronization
                 case ServerToClientOpCode.ErrorMethod:
                     {
                         var data = arg as PackageErrorMethod;
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageErrorMethod cast null");
+                        }
+
                         _ErrorReturnValue(data.ReturnTarget, data.Method, data.Message);
                     }
 
@@ -109,6 +126,11 @@ namespace Synchronization
                 case ServerToClientOpCode.ReturnValue:
                     {
                         var data = arg as PackageReturnValue;
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageReturnValue cast null");
+                        }
+
                         _SetReturnValue(data.ReturnTarget, data.ReturnValue);
                     }
 
@@ -116,6 +138,11 @@ namespace Synchronization
                 case ServerToClientOpCode.LoadSoulCompile:
                     {
                         var data = arg as PackageLoadSoulCompile;
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageLoadSoulCompile cast null");
+                        }
+
                         _LoadSoulCompile(data.TypeName, data.EntityId, data.ReturnId);
                     }
 
@@ -123,6 +150,11 @@ namespace Synchronization
                 case ServerToClientOpCode.LoadSoul:
                     {
                         var data = arg as PackageLoadSoul;
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageLoadSoul cast null");
+                        }
+
                         _LoadSoul(data.TypeName, data.EntityId, data.ReturnType);
                     }
 
@@ -130,6 +162,11 @@ namespace Synchronization
                 case ServerToClientOpCode.UnloadSoul:
                     {
                         var data = arg as PackageUnloadSoul;
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageUnloadSoul cast null");
+                        }
+
                         _UnloadSoul(data.TypeName, data.EntityId);
                     }
 
@@ -138,6 +175,10 @@ namespace Synchronization
                     {
                         var data = arg as PackageProtocolSubmit;
 
+                        if (data == null)
+                        {
+                            throw new NullReferenceException("PackageProtocolSubmit cast null");
+                        }
                         // _ProtocolSubmit(data);
                     }
 

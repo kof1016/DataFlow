@@ -24,7 +24,7 @@ namespace Console
 
         private readonly Regulus.Utility.Console.IViewer _Viewer;
 
-        private Center _Center;
+       private Center _Center;
 
         public Logic(
             ISoulBinder binder,

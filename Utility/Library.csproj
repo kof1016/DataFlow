@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Hall.cs" />
     <Compile Include="Synchronize\IProvider.cs" />
     <Compile Include="Synchronize\TProvider.cs" />
     <Compile Include="TypeHelper\AssemblyBuilder.cs" />
@@ -58,7 +57,6 @@
     <Compile Include="Synchronize\INotifier.cs" />
     <Compile Include="Utility\IStage.cs" />
     <Compile Include="Utility\IUpdatable.cs" />
-    <Compile Include="Game\IUser.cs" />
     <Compile Include="Synchronize\IValue.cs" />
     <Compile Include="Utility\Launcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +65,8 @@
     <Compile Include="Utility\Updater.cs" />
     <Compile Include="Synchronize\Value.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Game\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

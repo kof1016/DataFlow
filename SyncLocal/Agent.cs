@@ -10,14 +10,8 @@ using Synchronization.Interface;
 
 namespace SyncLocal
 {
-    public class Agent : ISoulBinder, IGhostQuerier , IUpdatable
+    public class Agent : ISoulBinder, IGhostQuerier, IUpdatable
     {
-        public delegate void ConnectedCallback();
-
-        
-
-        public event ConnectedCallback OnConnectedEvent;
-
         private readonly CommandBridge _CommandBridge;
 
         private readonly GhostProvider _GhostProvider;
@@ -25,8 +19,6 @@ namespace SyncLocal
         private readonly GhostRequest _GhostRequest;
 
         private readonly SoulProvider _SoulProvider;
-
-        private bool _Connected;
 
         public readonly ISoulBinder Binder;
 
@@ -45,24 +37,10 @@ namespace SyncLocal
             _Launch();
         }
 
-        void IBootable.Launch()
+        INotifier<T> IGhostQuerier.QueryNotifier<T>()
         {
-            //_Launch();
+            return _QueryProvider<T>();
         }
-
-        void IBootable.Shutdown()
-        {
-            _Shutdown();
-        }
-
-        bool IUpdatable.Update()
-        {
-            _Update();
-
-            return true;
-        }
-
-        
 
         event Action ISoulBinder.OnBreakEvent
         {
@@ -90,7 +68,22 @@ namespace SyncLocal
             _Unbind(soul);
         }
 
-        
+        void IBootable.Launch()
+        {
+            // _Launch();
+        }
+
+        void IBootable.Shutdown()
+        {
+            _Shutdown();
+        }
+
+        bool IUpdatable.Update()
+        {
+            _Update();
+
+            return true;
+        }
 
         private void _Update()
         {
@@ -110,10 +103,9 @@ namespace SyncLocal
 
         private void _Launch()
         {
-           // _GhostRequest.OnPingEvent += _OnRequestPing;
+            // _GhostRequest.OnPingEvent += _OnRequestPing;
             _GhostRequest.OnReleaseEvent += _SoulProvider.Unbind;
 
-            
             _GhostProvider.Initial(_GhostRequest);
         }
 
@@ -124,27 +116,16 @@ namespace SyncLocal
 
         private void _Shutdown()
         {
-            // _GhostProvider.OnErrorVerifyEvent -= _OnErrorVerifyEvent;
-            
-
-            _Connected = false;
-
             _CommandBridge.Break();
 
             _GhostProvider.Finial();
 
-            //_GhostRequest.OnPingEvent -= _OnRequestPing;
             _GhostRequest.OnReleaseEvent -= _SoulProvider.Unbind;
         }
 
         private void _OnRequestPing()
         {
             _GhostProvider.OnResponse(ServerToClientOpCode.Ping, new object[0]);
-        }
-
-        INotifier<T> IGhostQuerier.QueryNotifier<T>()
-        {
-            return _QueryProvider<T>();
         }
     }
 }
