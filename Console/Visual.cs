@@ -17,6 +17,7 @@ namespace Console
 {
     public class Visual : IUpdatable
     {
+        // test
         private readonly IGhostQuerier _GhostQuerier;
         private readonly Command _Command;
         private Regulus.Utility.Console.IViewer _Viewer;
