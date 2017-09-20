@@ -2,6 +2,7 @@ using System;
 
 namespace Synchronization.Data
 {
+    [Serializable]
     public class RequestPackage
     {
         public ClientToServerOpCode Code;
