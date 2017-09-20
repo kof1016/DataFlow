@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D62013BA-4663-4657-9FBA-97D6B1776F3C}</ProjectGuid>
+    <ProjectGuid>{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Library</RootNamespace>
-    <AssemblyName>MessagingGatewayLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <RootNamespace>Serialization</RootNamespace>
+    <AssemblyName>Serialization</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,34 +40,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Serialization\Varint.cs" />
-    <Compile Include="Synchronize\IProvider.cs" />
-    <Compile Include="Serialization\ISerializer.cs" />
-    <Compile Include="Synchronize\TProvider.cs" />
-    <Compile Include="TypeHelper\AssemblyBuilder.cs" />
-    <Compile Include="TypeHelper\BilateralMap.cs" />
-    <Compile Include="Utility\CodeBuilder.cs" />
-    <Compile Include="Utility\Comparison.cs" />
-    <Compile Include="Utility\EmptyStage.cs" />
-    <Compile Include="TypeHelper\EnumDescriptionAttribute.cs" />
-    <Compile Include="TypeHelper\EnumDescriptionExtension.cs" />
-    <Compile Include="TypeHelper\EnumHelper.cs" />
-    <Compile Include="TypeHelper\Flag.cs" />
-    <Compile Include="Framework\IBootable.cs" />
-    <Compile Include="Synchronize\IGhost.cs" />
-    <Compile Include="Synchronize\INotifier.cs" />
-    <Compile Include="Utility\IStage.cs" />
-    <Compile Include="Utility\IUpdatable.cs" />
-    <Compile Include="Synchronize\IValue.cs" />
-    <Compile Include="Utility\Launcher.cs" />
+    <Compile Include="ArrayDescriber.cs" />
+    <Compile Include="BlittableDescriber.cs" />
+    <Compile Include="BufferDescriber.cs" />
+    <Compile Include="ByteArrayDescriber.cs" />
+    <Compile Include="DescriberBuilder.cs" />
+    <Compile Include="Serializer.cs" />
+    <Compile Include="TypeIdentifier.cs" />
+    <Compile Include="ClassDescriber.cs" />
+    <Compile Include="DescriberException.cs" />
+    <Compile Include="EnumDescriber.cs" />
+    <Compile Include="ITypeDescriber.cs" />
+    <Compile Include="NumberDescriber.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utility\StateMachine.cs" />
-    <Compile Include="Utility\TimeCounter.cs" />
-    <Compile Include="Utility\Updater.cs" />
-    <Compile Include="Synchronize\Value.cs" />
+    <Compile Include="StringDescriber.cs" />
+    <Compile Include="TypeSet.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Game\" />
+    <ProjectReference Include="..\Utility\Library.csproj">
+      <Project>{D62013BA-4663-4657-9FBA-97D6B1776F3C}</Project>
+      <Name>Library</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

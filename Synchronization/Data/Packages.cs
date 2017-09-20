@@ -1,5 +1,8 @@
 using System;
 
+using Library.Serialization;
+using Library.Synchronize;
+
 namespace Synchronization.Data
 {
     [Serializable]
@@ -7,93 +10,159 @@ namespace Synchronization.Data
     {
         public ClientToServerOpCode Code;
 
-        public object Data;
+        public byte[] Data;
     }
 
+    [Serializable]
     public class ResponsePackage
     {
         public ServerToClientOpCode Code;
 
-        public object Data;
+        public byte[] Data;
     }
 
-    public class PackageUpdateProperty 
+    [Serializable]
+    public class TPackageData<TData> where TData : class
     {
-        public string PropertyName;
+        public byte[] ToBuffer(ISerializer serializer)
+        {
+            return serializer.Serialize(this);
+        }
+    }
+
+    [Serializable]
+    public class PackageUpdateProperty : TPackageData<PackageUpdateProperty>
+    {
+        public PackageUpdateProperty()
+        {
+            Args = new byte[0];
+        }
+
+        public int Property;
 
         public Guid EntityId;
 
-        public object Arg;
+        public byte[] Args;
     }
 
-    public class PackageInvokeEvent
+    public class PackageInvokeEvent : TPackageData<PackageInvokeEvent>
     {
-        public string EventName;
+        public PackageInvokeEvent()
+        {
+            EventParams = new byte[0][];
+        }
+            
+        public int Event;
 
         public Guid EntityId;
 
-        public object[] EventParams;
+        public byte[][] EventParams;
     }
 
-    public class PackageErrorMethod
+    [Serializable]
+    public class PackageErrorMethod : TPackageData<PackageErrorMethod>
     {
+        public PackageErrorMethod()
+        {
+            Method = string.Empty;
+
+            Message = string.Empty;
+        }
+
         public Guid ReturnTarget;
 
-        public string Method = string.Empty;
+        public string Method;
 
-        public string Message = string.Empty;
+        public string Message;
     }
 
-    public class PackageReturnValue
+    [Serializable]
+    public class PackageReturnValue : TPackageData<PackageReturnValue>
     {
+        public PackageReturnValue()
+        {
+            ReturnValue = new byte[0];
+        }
+
         public Guid ReturnTarget;
 
-        public object ReturnValue;
+        public byte[] ReturnValue;
     }
 
-    public class PackageLoadSoulCompile
+    [Serializable]
+    public class PackageLoadSoulCompile : TPackageData<PackageLoadSoulCompile>
     {
-        public string TypeName;
+        public PackageLoadSoulCompile()
+        {
+        }
+
+        public int TypeId;
 
         public Guid EntityId;
 
         public Guid ReturnId;
     }
 
-    public class PackageLoadSoul
+    [Serializable]
+    public class PackageLoadSoul : TPackageData<PackageLoadSoul>
     {
-        public string TypeName;
+        public PackageLoadSoul()
+        {
+        }
+
+        public int TypeId;
 
         public Guid EntityId;
 
         public bool ReturnType;
     }
 
-    public class PackageUnloadSoul
+    [Serializable]
+    public class PackageUnloadSoul : TPackageData<PackageUnloadSoul>
     {
-        public string TypeName;
+        public PackageUnloadSoul()
+        {
+        }
+
+        public int TypeId;
 
         public Guid EntityId;
     }
 
-    public class PackageCallMethod
+    [Serializable]
+    public class PackageCallMethod : TPackageData<PackageCallMethod>
     {
-        public string MethodName;
+        public PackageCallMethod()
+        {
+            MethodParams = new byte[0][];
+        }
+
+        public int MethodId;
 
         public Guid EntityId;
 
         public Guid ReturnId;
 
-        public object[] MethodParams;
+        public byte[][] MethodParams;
     }
 
-    public class PackageProtocolSubmit
+    [Serializable]
+    public class PackageProtocolSubmit : TPackageData<PackageProtocolSubmit>
     {
-        public object[] VerificationCode;
+        public PackageProtocolSubmit()
+        {
+        }
+
+        public byte[] VerificationCode;
     }
 
-    public class PackageRelease
+    [Serializable]
+    public class PackageRelease : TPackageData<PackageRelease>
     {
+        public PackageRelease()
+        {
+        }
+
         public Guid EntityId;
     }
 }

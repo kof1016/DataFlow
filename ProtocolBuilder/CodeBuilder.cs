@@ -98,34 +98,99 @@ namespace ProtocolBuilder
             var addDescriberCode = string.Join(",", _GetSerializarType(serializerTypes));
             var addEventCode = string.Join("\n", addEventType.ToArray());
             var tokens = protocol_name.Split(new[] { '.' });
-            var procotolName = tokens.Last();
+            var protocolName = tokens.Last();
 
             var providerNamespace = string.Join(".", tokens.Take(tokens.Count() - 1).ToArray());
-            var providerNamespaceHead = "";
-            var providerNamespaceTail = "";
+
+            var providerNamespaceHead = string.Empty;
+
+            var providerNamespaceTail = string.Empty;
+
             if (string.IsNullOrEmpty(providerNamespace) == false)
             {
                 providerNamespaceHead = $"namespace {providerNamespace}{{ ";
                 providerNamespaceTail = "}";
             }
+
+            var builder = new StringBuilder();
+            builder.Append(addTypeCode);
+            builder.Append(addEventCode);
+            builder.Append(addDescriberCode);
+
+            var verificationCode = _BuildVerificationCode(builder);
+
+            var providerCode =
+                    $@"
+            using System;  
+            using System.Collections.Generic;
+            
+            {providerNamespaceHead}
+                public class {protocolName} : Synchronization.PreGenerated.IProtocol
+                {{
+                    Synchronization.PreGenerated.InterfaceProvider _InterfaceProvider;
+                    Synchronization.PreGenerated.EventProvider _EventProvider;
+                    Synchronization.PreGenerated.MemberMap _MemberMap;
+                    Library.Serialization.ISerializer _Serializer;
+                    public {protocolName}()
+                    {{
+                        var types = new Dictionary<Type, Type>();
+                        {addTypeCode}
+                        _InterfaceProvider = new Synchronization.PreGenerated.InterfaceProvider(types);
+
+                        var eventClosures = new List<Synchronization.Interface.IEventProxyCreator>();
+                        {addEventCode}
+                        _EventProvider = new  Synchronization.PreGenerated.EventProvider(eventClosures);
+
+                        _Serializer = new Serialization.Serializer(new Serialization.DescriberBuilder({addDescriberCode}));
+
+
+                        _MemberMap = new Synchronization.PreGenerated.MemberMap(new[] {{{addMemberMapMethodCode}}} ,new[]{{ {addMemberMapEventCode} }}, new [] {{{addMemberMapPropertyCode} }}, new [] {{{addMemberMapInterfaceCode}}});
+                    }}
+
+                    byte[] Synchronization.PreGenerated.IProtocol.VerificationCode {{ get {{ return new byte[]{{{verificationCode}}};}} }}
+                    Synchronization.PreGenerated.InterfaceProvider Synchronization.PreGenerated.IProtocol.GetInterfaceProvider()
+                    {{
+                        return _InterfaceProvider;
+                    }}
+
+                    Synchronization.PreGenerated.EventProvider Synchronization.PreGenerated.IProtocol.GetEventProvider()
+                    {{
+                        return _EventProvider;
+                    }}
+
+                    Serialization.ISerializer Synchronization.PreGenerated.IProtocol.GetSerialize()
+                    {{
+                        return _Serializer;
+                    }}
+
+                    Synchronization.PreGenerated.MemberMap Synchronization.PreGenerated.IProtocol.GetMemberMap()
+                    {{
+                        return _MemberMap;
+                    }}
+                    
+                }}
+            {providerNamespaceTail}
+            ";
+
+            OnProviderEvent?.Invoke(protocol_name, providerCode);
         }
 
         private string[] _GetSerializarType(HashSet<Type> serializer_types)
         {
             var types = new HashSet<Type>();
 
-            serializer_types.Add(typeof(Synchronization.Data.PackageProtocolSubmit));
+            serializer_types.Add(typeof(PackageProtocolSubmit));
             serializer_types.Add(typeof(RequestPackage));
             serializer_types.Add(typeof(ResponsePackage));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageUpdateProperty));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageInvokeEvent));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageErrorMethod));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageReturnValue));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageLoadSoulCompile));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageLoadSoul));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageUnloadSoul));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageCallMethod));
-            serializer_types.Add(typeof(Regulus.Remoting.PackageRelease));
+            serializer_types.Add(typeof(PackageUpdateProperty));
+            serializer_types.Add(typeof(PackageInvokeEvent));
+            serializer_types.Add(typeof(PackageErrorMethod));
+            serializer_types.Add(typeof(PackageReturnValue));
+            serializer_types.Add(typeof(PackageLoadSoulCompile));
+            serializer_types.Add(typeof(PackageLoadSoul));
+            serializer_types.Add(typeof(PackageUnloadSoul));
+            serializer_types.Add(typeof(PackageCallMethod));
+            serializer_types.Add(typeof(PackageRelease));
 
             foreach (var serializerType in serializer_types)
             {
@@ -137,11 +202,12 @@ namespace ProtocolBuilder
             }
             var typeCodes = (from type in types orderby type.FullName select "typeof(" + _GetTypeName(type) + ")").ToArray();
 
-            foreach (var type in types)
-            {
-                Regulus.Utility.Log.Instance.WriteInfo(type.FullName);
-            }
-            Regulus.Utility.Log.Instance.WriteInfo("Serializable object " + types.Count);
+            //            foreach (var type in types)
+            //            {
+            //                Regulus.Utility.Log.Instance.WriteInfo(type.FullName);
+            //            }
+            //            Regulus.Utility.Log.Instance.WriteInfo("Serializable object " + types.Count);
+
             return typeCodes;
         }
 

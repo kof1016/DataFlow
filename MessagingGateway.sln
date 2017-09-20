@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncLocal", "SyncLocal\Sync
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtocolBuilder", "ProtocolBuilder\ProtocolBuilder.csproj", "{546258FF-3C0E-4403-9E59-0E4E5D6689A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization", "Serialization\Serialization.csproj", "{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{546258FF-3C0E-4403-9E59-0E4E5D6689A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{546258FF-3C0E-4403-9E59-0E4E5D6689A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{546258FF-3C0E-4403-9E59-0E4E5D6689A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
