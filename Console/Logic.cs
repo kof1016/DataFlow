@@ -57,6 +57,27 @@ namespace Console
             return true;
         }
 
+        int IVerify.TestProperty
+        {
+            get
+            {
+                return 921;
+            }
+        }
+
+        private event Action<bool> _TestEvent;
+        event Action<bool> IVerify.TestEvent
+        {
+            add
+            {
+                _TestEvent += value;
+            }
+            remove
+            {
+                _TestEvent -= value;
+            }
+        }
+
         Value<bool> IVerify.Login(string id, string password)
         {
             _Viewer.WriteLine($"logic 收到 id = {id} password = {password}");
@@ -66,7 +87,7 @@ namespace Console
             var result = id == "1" && password == "1";
 
             returnValue.SetValue(result);
-
+            _TestEvent(true);
             return returnValue;
         }
     }

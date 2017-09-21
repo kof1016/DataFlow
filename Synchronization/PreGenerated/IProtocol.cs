@@ -1,4 +1,6 @@
 ﻿
+using Library.Serialization;
+
 namespace Synchronization.PreGenerated
 {
     public interface IProtocol
@@ -6,6 +8,8 @@ namespace Synchronization.PreGenerated
         EventProvider GetEventProvider();
 
         InterfaceProvider GetInterfaceProvider();
+
+        ISerializer GetSerialize();
 
         MemberMap GetMemberMap();
 

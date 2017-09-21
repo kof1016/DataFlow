@@ -6,11 +6,14 @@ using Library.Utility;
 
 using Synchronization;
 using Synchronization.Interface;
+using Synchronization.PreGenerated;
 
 namespace SyncLocal
 {
     public class Agent : ISoulBinder, IGhostQuerier, IUpdatable
     {
+        private readonly IProtocol _Protocol;
+
         private readonly CommandBridge _CommandBridge;
 
         private readonly GhostProvider _GhostProvider;
@@ -23,13 +26,14 @@ namespace SyncLocal
 
         public readonly IGhostQuerier GhostQuerier;
 
-        public Agent()
+        public Agent(IProtocol protocol)
         {
-            _GhostRequest = new GhostRequest();
-            _GhostProvider = new GhostProvider();
+            _Protocol = protocol;
+            _GhostRequest = new GhostRequest(protocol.GetSerialize());
+            _GhostProvider = new GhostProvider(_Protocol);
 
             _CommandBridge = new CommandBridge(_GhostProvider, _GhostRequest);
-            _SoulProvider = new SoulProvider(_CommandBridge.RequestQueue, _CommandBridge.ResponseQueue);
+            _SoulProvider = new SoulProvider(_CommandBridge.RequestQueue, _CommandBridge.ResponseQueue, _Protocol);
 
             Binder = _SoulProvider;
             GhostQuerier = this;

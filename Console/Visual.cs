@@ -53,14 +53,19 @@ namespace Console
         private void _SupplyVerify(IVerify obj)
         {
             // 直接呼叫
-            //            var result = obj.Login("1", "1");
-            //            result.OnValueEvent += (t) => { _Viewer.WriteLine($"回傳{t}"); };
+                        
+
+            _Viewer.WriteLine($"property{obj.TestProperty}");
+            obj.TestEvent += (result) =>
+            {
+                _Viewer.WriteLine($"event {result}");
+            };
 
 
             // command 使用方法1
-//            _Command.Register<string, string>(
-//                "m [a1, a2]", 
-//                (a1, a2) => { obj.Login(a1, a2); });
+            //            _Command.Register<string, string>(
+            //                "m [a1, a2]", 
+            //                (a1, a2) => { obj.Login(a1, a2); });
 
             // command 使用方法2
 

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Library.Serialization;
+
 using Synchronization;
 using Synchronization.Data;
 using Synchronization.Interface;
@@ -17,12 +19,15 @@ namespace SyncLocal
 
         private readonly Queue<RequestPackage> _Requests;
 
-        public GhostRequest()
+        private readonly ISerializer _Serializer;
+
+        public GhostRequest(ISerializer serializer)
         {
+            _Serializer = serializer;
             _Requests = new Queue<RequestPackage>();
         }
 
-        void IGhostRequest.Request(ClientToServerOpCode code, object arg)
+        void IGhostRequest.Request(ClientToServerOpCode code, byte[] args)
         {
             lock(_Requests)
             {
@@ -30,7 +35,7 @@ namespace SyncLocal
                     new RequestPackage
                     {
                         Code = code,
-                        Data = arg
+                        Data = args
                     });
             }
         }
@@ -53,7 +58,7 @@ namespace SyncLocal
             }
         }
 
-        private void _Apportion(ClientToServerOpCode code, object arg)
+        private void _Apportion(ClientToServerOpCode code, byte[] args)
         {
             switch(code)
             {
@@ -62,14 +67,16 @@ namespace SyncLocal
                     break;
                 case ClientToServerOpCode.CallMethod:
                     {
-                        var pkg = arg as PackageCallMethod;
-                        OnCallMethodEvent?.Invoke(pkg.EntityId, pkg.MethodName, pkg.ReturnId, pkg.MethodParams);
+                        var pkg = args.ToPackageData<PackageCallMethod>(_Serializer);
+
+                        OnCallMethodEvent?.Invoke(pkg.EntityId, pkg.MethodId, pkg.ReturnId, pkg.MethodParams);
                     }
 
                     break;
                 case ClientToServerOpCode.Release:
                     {
-                        var pkg = arg as PackageRelease;
+                        var pkg = args.ToPackageData<PackageRelease>(_Serializer);
+                        
                         OnReleaseEvent?.Invoke(pkg.EntityId);
                     }
 

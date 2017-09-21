@@ -65,6 +65,10 @@
       <Project>{A36EB06B-337C-4BF5-B655-1200D374566A}</Project>
       <Name>GameLogic</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Protocol\Protocol.csproj">
+      <Project>{546258ff-3c0e-4403-9e59-0e4e5d6689a4}</Project>
+      <Name>Protocol</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Synchronization\Synchronization.csproj">
       <Project>{71b3c1bc-00cb-4994-9775-f8b940c81cca}</Project>
       <Name>Synchronization</Name>
@@ -79,4 +83,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(SolutionDir)ProtocolBuilder\$(OutDir)*.* 
+ProtocolBuilder.exe build.ini</PostBuildEvent>
+  </PropertyGroup>
 </Project>

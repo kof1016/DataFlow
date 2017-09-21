@@ -1,56 +1,62 @@
 ﻿using System;
 
+using Library.Serialization;
+
 namespace Serialization
 {
     public class EnumDescriber : ITypeDescriber
     {
+        private readonly int _Id;
+
+        private readonly Type _Type;
+
+        private readonly object _Default;
+
         public EnumDescriber(int id, Type type)
         {
-            throw new NotImplementedException();
+            _Id = id;
+            _Type = type;
+
+            _Default = Activator.CreateInstance(type);
         }
 
         int ITypeDescriber.Id
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return _Id; }
         }
 
         Type ITypeDescriber.Type
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return _Type; }
         }
 
         object ITypeDescriber.Default
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return _Default; }
         }
 
         int ITypeDescriber.GetByteCount(object instance)
         {
-            throw new NotImplementedException();
+            return Varint.GetByteCount(Convert.ToUInt64(instance));
         }
 
         int ITypeDescriber.ToBuffer(object instance, byte[] buffer, int begin)
         {
-            throw new NotImplementedException();
+            return Varint.NumberToBuffer(buffer, begin, Convert.ToUInt64(instance));
         }
 
-        int ITypeDescriber.ToObject(byte[] buffer, int begin, out object instance)
+        int ITypeDescriber.ToObject(byte[] buffer, int begin, out object instnace)
         {
-            throw new NotImplementedException();
+            ulong value;
+            var readed = Varint.BufferToNumber(buffer, begin, out value);
+
+            instnace = Enum.ToObject(_Type, value);
+            return readed;
         }
 
         void ITypeDescriber.SetMap(TypeSet type_set)
         {
-            throw new NotImplementedException();
+
         }
     }
 }

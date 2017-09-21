@@ -7,7 +7,7 @@ using System.Text;
 
 using Synchronization.Data;
 
-namespace ProtocolBuilder
+namespace Protocol
 {
     public class CodeBuilder
     {
@@ -42,7 +42,7 @@ namespace ProtocolBuilder
 
                 if (!type.IsInterface)
                 {
-                    return;
+                    continue;
                 }
 
                 var ghostClassCode = _BuildGhostCode(type);
@@ -55,6 +55,7 @@ namespace ProtocolBuilder
 
                 OnGpiEvent?.Invoke(typeName, ghostClassCode);
 
+                // build event
                 foreach (var eventInfo in type.GetEvents())
                 {
                     addEventType.Add($"eventClosures.Add(new {_GetEventType(type, eventInfo.Name)}() );");
@@ -144,7 +145,7 @@ namespace ProtocolBuilder
                         _Serializer = new Serialization.Serializer(new Serialization.DescriberBuilder({addDescriberCode}));
 
 
-                        _MemberMap = new Synchronization.PreGenerated.MemberMap(new[] {{{addMemberMapMethodCode}}} ,new[]{{ {addMemberMapEventCode} }}, new [] {{{addMemberMapPropertyCode} }}, new [] {{{addMemberMapInterfaceCode}}});
+                        _MemberMap = new Synchronization.PreGenerated.MemberMap(new System.Reflection.MethodInfo[] {{{addMemberMapMethodCode}}} ,new System.Reflection.EventInfo[]{{ {addMemberMapEventCode} }}, new System.Reflection.PropertyInfo[] {{{addMemberMapPropertyCode} }}, new Type[] {{{addMemberMapInterfaceCode}}});
                     }}
 
                     byte[] Synchronization.PreGenerated.IProtocol.VerificationCode {{ get {{ return new byte[]{{{verificationCode}}};}} }}
@@ -158,7 +159,7 @@ namespace ProtocolBuilder
                         return _EventProvider;
                     }}
 
-                    Serialization.ISerializer Synchronization.PreGenerated.IProtocol.GetSerialize()
+                    Library.Serialization.ISerializer Synchronization.PreGenerated.IProtocol.GetSerialize()
                     {{
                         return _Serializer;
                     }}
@@ -427,7 +428,7 @@ namespace ProtocolBuilder
 
         private string _GetEventType(Type type, string event_name)
         {
-            return $"{type.Namespace}.Event.{type.Name}.{event_name}";
+            return $"{type.Namespace}.EventId.{type.Name}.{event_name}";
         }
 
         private string _BuildEventCode(Type type, EventInfo info)
@@ -441,7 +442,7 @@ namespace ProtocolBuilder
             using System;  
             using System.Collections.Generic;
     
-            namespace {nameSpace}.Event.{name} 
+            namespace {nameSpace}.EventId.{name} 
             {{ 
                 public class {eventName} : Synchronization.Interface.IEventProxyCreator
                 {{
@@ -455,7 +456,7 @@ namespace ProtocolBuilder
             
                     }}
     
-                    Delegate Synchronization.Interface.IEventProxyCreator.Create(Guid soul_id, string event_id, Synchronization.PreGenerated.InvokeEventCallback invoke_event)
+                    Delegate Synchronization.Interface.IEventProxyCreator.Create(Guid soul_id, int event_id, Synchronization.PreGenerated.InvokeEventCallback invoke_event)
                     {{                
                         var closure = new Synchronization.PreGenerated.GenericEventClosure{_GetTypes(argTypes)}(soul_id, event_id, invoke_event);                
                         return new Action{_GetTypes(argTypes)}(closure.Run);
@@ -480,8 +481,8 @@ namespace ProtocolBuilder
             var code = md5.ComputeHash(Encoding.Default.GetBytes(builder.ToString()));
 
             // Regulus.Utility.Log.Instance.WriteInfo("Verification Code " + Convert.ToBase64String(code));
-            // return string.Join(",", code.Select(val => val.ToString()).ToArray());
-            return string.Empty;
+             return string.Join(",", code.Select(val => val.ToString()).ToArray());
+            //return string.Empty;
         }
     }
 }

@@ -1,7 +1,10 @@
-﻿using Regulus.Utility;
+﻿using System.Reflection;
+
+using Regulus.Utility;
 
 using Synchronization;
 using Synchronization.Interface;
+using Synchronization.PreGenerated;
 
 using SyncLocal;
 
@@ -20,10 +23,22 @@ namespace Console
         private readonly Agent _Agent;
         public Application()
         {
-            var agent = new Agent();
+            var protocol = _CreateProtocol("MessagingGatewayDataDefine.Protocol.dll", "DataDefine.Protocol");
+
+            var agent = new Agent(protocol);
             _GhostQuerier = agent.GhostQuerier; // client
             _Binder = agent.Binder; // server
             _Agent = agent;
+        }
+
+        private IProtocol _CreateProtocol(string protocol_path, string protocol_type_name)
+        {
+            
+            var assembly = Assembly.LoadFile(System.IO.Path.GetFullPath(protocol_path) );
+
+
+            var instance = assembly.CreateInstance(protocol_type_name);
+            return instance as IProtocol;
         }
 
         protected override void _Launch()

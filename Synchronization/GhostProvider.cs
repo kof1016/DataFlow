@@ -4,12 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.Timers;
 
+using Library.Serialization;
 using Library.Synchronize;
-using Library.TypeHelper;
 using Library.Utility;
 
 using Synchronization.Data;
 using Synchronization.Interface;
+using Synchronization.PreGenerated;
 
 namespace Synchronization
 {
@@ -19,11 +20,15 @@ namespace Synchronization
 
         private readonly AutoRelease _AutoRelease;
 
-        private readonly GhostInterfaceProvider _GhostInterfaceProvider;
+        private readonly InterfaceProvider _GhostInterfaceProvider;
+
+        private readonly IProtocol _Protocol;
 
         private readonly ReturnValueQueue _ReturnValueQueue;
 
-        private readonly Dictionary<string, IProvider> _ServerProviders;
+        private readonly ISerializer _Serializer;
+
+        private readonly Dictionary<Type, IProvider> _ServerProviders;
 
         private readonly object _Sync = new object();
 
@@ -37,13 +42,16 @@ namespace Synchronization
 
         public bool Enable { get; private set; }
 
-        public GhostProvider()
+        public GhostProvider(IProtocol protocol)
         {
-            _GhostInterfaceProvider = new GhostInterfaceProvider();
+            _Protocol = protocol;
+            _Serializer = _Protocol.GetSerialize();
+            _GhostInterfaceProvider = protocol.GetInterfaceProvider();
 
             _ReturnValueQueue = new ReturnValueQueue();
 
-            _ServerProviders = new Dictionary<string, IProvider>();
+            _ServerProviders = new Dictionary<Type, IProvider>();
+
             _AutoRelease = new AutoRelease(_Requester);
         }
 
@@ -69,13 +77,13 @@ namespace Synchronization
             _EndPing();
         }
 
-        public void OnResponse(ServerToClientOpCode id, object arg)
+        public void OnResponse(ServerToClientOpCode id, byte[] args)
         {
-            _OnResponse(id, arg);
+            _OnResponse(id, args);
             _AutoRelease.Update();
         }
 
-        protected void _OnResponse(ServerToClientOpCode id, object arg)
+        protected void _OnResponse(ServerToClientOpCode id, byte[] args)
         {
             switch(id)
             {
@@ -84,101 +92,106 @@ namespace Synchronization
                     _StartPing();
                     break;
                 case ServerToClientOpCode.UpdateProperty:
+                {
+                    var data = args.ToPackageData<PackageUpdateProperty>(_Serializer);
+
+                    if(data == null)
                     {
-                        var data = arg as PackageUpdateProperty;
-
-                        if(data == null)
-                        {
-                            throw new NullReferenceException("PackageUpdateProperty cast null");
-                        }
-
-                        _UpdateProperty(data.PropertyName, data.EntityId, data.Arg);
+                        throw new NullReferenceException("PackageUpdateProperty cast null");
                     }
+
+                    _UpdateProperty(data.PropertyId, data.EntityId, data.Args);
+                }
 
                     break;
                 case ServerToClientOpCode.InvokeEvent:
-                    {
-                        var data = arg as PackageInvokeEvent;
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageInvokeEvent cast null");
-                        }
+                {
+                    var data = args.ToPackageData<PackageInvokeEvent>(_Serializer);
 
-                        _InvokeEvent(data.EntityId, data.EventName, data.EventParams);
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageInvokeEvent cast null");
                     }
+
+                    _InvokeEvent(data.EntityId, data.EventId, data.EventParams);
+                }
 
                     break;
                 case ServerToClientOpCode.ErrorMethod:
-                    {
-                        var data = arg as PackageErrorMethod;
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageErrorMethod cast null");
-                        }
+                {
+                    var data = args.ToPackageData<PackageErrorMethod>(_Serializer);
 
-                        _ErrorReturnValue(data.ReturnTarget, data.Method, data.Message);
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageErrorMethod cast null");
                     }
+
+                    _ErrorReturnValue(data.ReturnTarget, data.Method, data.Message);
+                }
 
                     break;
                 case ServerToClientOpCode.ReturnValue:
-                    {
-                        var data = arg as PackageReturnValue;
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageReturnValue cast null");
-                        }
+                {
+                    var data = args.ToPackageData<PackageReturnValue>(_Serializer);
 
-                        _SetReturnValue(data.ReturnTarget, data.ReturnValue);
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageReturnValue cast null");
                     }
+
+                    _SetReturnValue(data.ReturnTarget, data.ReturnValue);
+                }
 
                     break;
                 case ServerToClientOpCode.LoadSoulCompile:
-                    {
-                        var data = arg as PackageLoadSoulCompile;
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageLoadSoulCompile cast null");
-                        }
+                {
+                    var data = args.ToPackageData<PackageLoadSoulCompile>(_Serializer);
 
-                        _LoadSoulCompile(data.TypeName, data.EntityId, data.ReturnId);
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageLoadSoulCompile cast null");
                     }
+
+                    _LoadSoulCompile(data.TypeId, data.EntityId, data.ReturnId);
+                }
 
                     break;
                 case ServerToClientOpCode.LoadSoul:
-                    {
-                        var data = arg as PackageLoadSoul;
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageLoadSoul cast null");
-                        }
+                {
+                    var data = args.ToPackageData<PackageLoadSoul>(_Serializer);
 
-                        _LoadSoul(data.TypeName, data.EntityId, data.ReturnType);
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageLoadSoul cast null");
                     }
+
+                    _LoadSoul(data.TypeId, data.EntityId, data.ReturnType);
+                }
 
                     break;
-                case ServerToClientOpCode.UnloadSoul:
-                    {
-                        var data = arg as PackageUnloadSoul;
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageUnloadSoul cast null");
-                        }
 
-                        _UnloadSoul(data.TypeName, data.EntityId);
+                case ServerToClientOpCode.UnloadSoul:
+                {
+                    var data = args.ToPackageData<PackageUnloadSoul>(_Serializer);
+
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageUnloadSoul cast null");
                     }
+
+                    _UnloadSoul(data.TypeId, data.EntityId);
+                }
 
                     break;
                 case ServerToClientOpCode.ProtocolSubmit:
-                    {
-                        var data = arg as PackageProtocolSubmit;
+                {
+                    var data = args.ToPackageData<PackageProtocolSubmit>(_Serializer);
 
-                        if (data == null)
-                        {
-                            throw new NullReferenceException("PackageProtocolSubmit cast null");
-                        }
-                        
-                        // _ProtocolSubmit(data);
+                    if(data == null)
+                    {
+                        throw new NullReferenceException("PackageProtocolSubmit cast null");
                     }
+                }
 
                     break;
                 default:
@@ -186,17 +199,23 @@ namespace Synchronization
             }
         }
 
-        private void _UpdateProperty(string property_name, Guid entity_id, object arg)
+        private void _UpdateProperty(int property, Guid entity_id, byte[] arg)
         {
-            var ghostInterface = _FindGhost(entity_id);
+            var ghost = _FindGhost(entity_id);
 
-            var instance = ghostInterface.GetInstance();
-
-            var field = ghostInterface.GetType().GetField("_" + property_name, BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if(field != null)
+            if (ghost != null)
             {
-                field.SetValue(instance, arg);
+                var map = _Protocol.GetMemberMap();
+                var info = map.GetProperty(property);
+                var value = _Serializer.Deserialize(arg);
+                var instance = ghost.GetInstance();
+                var type = _GhostInterfaceProvider.Find(info.DeclaringType);
+                var field = type.GetField("_" + info.Name, BindingFlags.Instance | BindingFlags.NonPublic);
+                if (field != null)
+                {
+                    field.SetValue(instance, value);
+                }
+
             }
         }
 
@@ -207,15 +226,18 @@ namespace Synchronization
             OnErrorMethodEvent?.Invoke(method, message);
         }
 
-        private void _SetReturnValue(Guid return_target, object return_value)
+        private void _SetReturnValue(Guid return_target, byte[] return_value)
         {
             var value = _ReturnValueQueue.PopReturnValue(return_target);
-            value?.SetValue(return_value);
+            value?.SetValue(_Serializer.Deserialize(return_value));
         }
 
-        private void _LoadSoulCompile(string type_name, Guid entity_id, Guid return_id)
+        private void _LoadSoulCompile(int type_id, Guid entity_id, Guid return_id)
         {
-            var provider = _QueryServerProvider(type_name);
+            var map = _Protocol.GetMemberMap();
+            var type = map.GetInterface(type_id);
+
+            var provider = _QueryServerProvider(type);
 
             if(provider != null)
             {
@@ -230,15 +252,16 @@ namespace Synchronization
             value?.SetValue(ghost);
         }
 
-        private void _LoadSoul(string type_name, Guid id, bool return_type)
+        private void _LoadSoul(int type_id, Guid id, bool return_type)
         {
-            var serverProvider = _QueryServerProvider(type_name);
+            var map = _Protocol.GetMemberMap();
+            var type = map.GetInterface(type_id);
 
-            var type = _FindCurrentDomainType(type_name);
+            var serverProvider = _QueryServerProvider(type);
 
             var ghostInterface = _BuildGhostInstance(type, id, return_type);
 
-            ghostInterface.CallMethodEvent += new GhostMethodHandler(ghostInterface, _ReturnValueQueue, _Requester).Run;
+            ghostInterface.CallMethodEvent += new GhostMethodHandler(ghostInterface, _ReturnValueQueue, _Protocol, _Requester).Run;
 
             serverProvider.Add(ghostInterface);
 
@@ -269,9 +292,12 @@ namespace Synchronization
             return null;
         }
 
-        private void _UnloadSoul(string type_name, Guid id)
+        private void _UnloadSoul(int type_id, Guid id)
         {
-            var provider = _QueryServerProvider(type_name);
+            var map = _Protocol.GetMemberMap();
+            var type = map.GetInterface(type_id);
+
+            var provider = _QueryServerProvider(type);
 
             provider?.Remove(id);
         }
@@ -287,11 +313,11 @@ namespace Synchronization
 
             var constructor = ghostType.GetConstructor(
                                                        new[]
-                                                           {
-                                                               typeof(Guid),
-                                                               typeof(Type),
-                                                               typeof(bool)
-                                                           });
+                                                       {
+                                                           typeof(Guid),
+                                                           typeof(Type),
+                                                           typeof(bool)
+                                                       });
             if(constructor == null)
             {
                 var constructorInfos = new List<string>();
@@ -306,85 +332,95 @@ namespace Synchronization
 
             var o = constructor.Invoke(
                                        new object[]
-                                           {
-                                               id,
-                                               ghostType,
-                                               return_type
-                                           });
+                                       {
+                                           id,
+                                           ghostType,
+                                           return_type
+                                       });
 
             return (IGhost)o;
         }
 
         public INotifier<T> QueryProvider<T>()
         {
-            return _QueryServerProvider(typeof(T).Name) as INotifier<T>;
+            return _QueryServerProvider(typeof(T)) as INotifier<T>;
         }
 
-        private IProvider _QueryServerProvider(string type_name)
+        private IProvider _QueryServerProvider(Type type)
         {
             IProvider provider;
             lock(_ServerProviders)
             {
-                if(_ServerProviders.TryGetValue(type_name, out provider) == false)
+                if(_ServerProviders.TryGetValue(type, out provider))
                 {
-                    provider = _BuildServerProvider(type_name);
-                    _ServerProviders.Add(type_name, provider);
+                    return provider;
                 }
+
+                provider = _BuildServerProvider(type);
+                _ServerProviders.Add(type, provider);
             }
 
             return provider;
         }
 
-        private IProvider _BuildServerProvider(string type_name)
+        private IProvider _BuildServerProvider(Type type)
         {
             var providerTemplateType = typeof(TProvider<>);
-
-            var type = _FindCurrentDomainType(type_name);
 
             var providerType = providerTemplateType.MakeGenericType(type);
 
             return Activator.CreateInstance(providerType) as IProvider;
         }
 
-        private void _InvokeEvent(Guid ghost_id, string event_name, object[] event_params)
+        private void _InvokeEvent(Guid ghost_id, int event_id, byte[][] event_params)
         {
             var ghost = _FindGhost(ghost_id);
 
-            var type = ghost.GetType();
-
-            var instance = ghost.GetInstance();
-
-            var eventInfos = type.GetField("_" + event_name, BindingFlags.Instance | BindingFlags.NonPublic);
-
-            var fieldValue = eventInfos?.GetValue(instance);
-
-            var fieldValueDelegate = fieldValue as Delegate;
-
-            try
+            if (ghost != null)
             {
-                fieldValueDelegate?.DynamicInvoke(event_params);
-            }
-            catch(TargetInvocationException tie)
-            {
-                throw new Exception($"Call event error in {type.FullName}:{event_name}. \n{tie.InnerException}");
-            }
-            catch(Exception)
-            {
-                throw new Exception($"Call event error in {type.FullName}:{event_name}.");
+                var map = _Protocol.GetMemberMap();
+                var info = map.GetEvent(event_id);
+
+
+                Type type = _GhostInterfaceProvider.Find(info.DeclaringType);
+                var instance = ghost.GetInstance();
+                if (type != null)
+                {
+                    var eventInfos = type.GetField("_" + info.Name, BindingFlags.Instance | BindingFlags.NonPublic);
+                    var fieldValue = eventInfos.GetValue(instance);
+                    if (fieldValue is Delegate)
+                    {
+                        var fieldValueDelegate = fieldValue as Delegate;
+
+                        var pars = (from a in event_params select _Serializer.Deserialize(a)).ToArray();
+                        try
+                        {
+                            fieldValueDelegate.DynamicInvoke(pars);
+                        }
+                        catch (TargetInvocationException tie)
+                        {
+                            
+                            throw tie;
+                        }
+                        catch (Exception e)
+                        {
+                            
+                            throw e;
+                        }
+                    }
+                }
             }
         }
 
         private Type _QueryGhostType(Type ghost_base_type)
         {
-            if(_GhostInterfaceProvider.Find(ghost_base_type) != null)
-            {
-                return _GhostInterfaceProvider.Find(ghost_base_type);
-            }
-
-            var ghostType = new AssemblyBuilder().Build(ghost_base_type, typeof(IGhost).Assembly.Location, typeof(IEventProxyCreator).Assembly.Location);
-
-            _GhostInterfaceProvider.Add(ghost_base_type, ghostType);
-
+            // if(_GhostInterfaceProvider.Find(ghost_base_type) != null)
+            // {
+            // return _GhostInterfaceProvider.Find(ghost_base_type);
+            // }
+            // var ghostType = new AssemblyBuilder().Build(ghost_base_type, typeof(IGhost).Assembly.Location, typeof(IEventProxyCreator).Assembly.Location);
+            // _GhostInterfaceProvider.Add(ghost_base_type, ghostType);
+            // return _GhostInterfaceProvider.Find(ghost_base_type);
             return _GhostInterfaceProvider.Find(ghost_base_type);
         }
 
@@ -407,10 +443,10 @@ namespace Synchronization
             lock(_Sync)
             {
                 _PingTimer = new Timer(1000)
-                                 {
-                                     Enabled = true,
-                                     AutoReset = true
-                                 };
+                {
+                    Enabled = true,
+                    AutoReset = true
+                };
                 _PingTimer.Elapsed += _PingTimerElapsed;
                 _PingTimer.Start();
             }

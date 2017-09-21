@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ProtocolBuilder2")]
+[assembly: AssemblyTitle("ProtocolBuilder")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ProtocolBuilder2")]
+[assembly: AssemblyProduct("ProtocolBuilder")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("40630bb8-1e0d-473d-8e2b-1b3bea65703f")]
+[assembly: Guid("546258ff-3c0e-4403-9e59-0e4e5d6689a4")]
 
 // Version information for an assembly consists of the following four values:
 //

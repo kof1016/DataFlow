@@ -42,7 +42,7 @@ namespace SyncLocal
         {
         }
 
-        void IResponseQueue.Push(ServerToClientOpCode code, object package)
+        void IResponseQueue.Push(ServerToClientOpCode code, byte[] package)
         {
             _GhostProvider.OnResponse(code, package);
         }

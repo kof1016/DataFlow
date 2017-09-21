@@ -6,7 +6,7 @@ using Library.Synchronize;
 
 using Serialization;
 
-namespace ProtocolBuilder
+namespace Protocol
 {
     public class TypeDisintegrator
     {

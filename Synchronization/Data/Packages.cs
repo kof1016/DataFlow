@@ -30,6 +30,14 @@ namespace Synchronization.Data
         }
     }
 
+    public static class PackageHelper
+    {
+        public static TData ToPackageData<TData>(this byte[] buffer, ISerializer serializer) where TData : TPackageData<TData>
+        {
+            return serializer.Deserialize(buffer) as TData;
+        }
+    }
+
     [Serializable]
     public class PackageUpdateProperty : TPackageData<PackageUpdateProperty>
     {
@@ -38,7 +46,7 @@ namespace Synchronization.Data
             Args = new byte[0];
         }
 
-        public int Property;
+        public int PropertyId;
 
         public Guid EntityId;
 
@@ -52,7 +60,7 @@ namespace Synchronization.Data
             EventParams = new byte[0][];
         }
             
-        public int Event;
+        public int EventId;
 
         public Guid EntityId;
 

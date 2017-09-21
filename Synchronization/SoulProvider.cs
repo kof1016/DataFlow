@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Library.Serialization;
 using Library.Synchronize;
 
 using Synchronization.Data;
@@ -13,11 +14,13 @@ namespace Synchronization
 {
     public class SoulProvider : IDisposable, ISoulBinder
     {
-        private readonly Queue<object> _EventFilter = new Queue<object>();
+        private readonly Queue<byte[]> _EventFilter = new Queue<byte[]>();
 
         private readonly IRequestQueue _Peer;
 
         private readonly IResponseQueue _Queue;
+
+        private readonly IProtocol _Protocol;
 
         private readonly List<Soul> _Souls = new List<Soul>();
 
@@ -25,9 +28,13 @@ namespace Synchronization
 
         private DateTime _UpdatePropertyInterval;
 
-        public SoulProvider(IRequestQueue peer, IResponseQueue queue)
+        private readonly ISerializer _Serialize;
+
+        public SoulProvider(IRequestQueue peer, IResponseQueue queue, IProtocol protocol)
         {
             _Queue = queue;
+            _Protocol = protocol;
+            _Serialize = protocol.GetSerialize();
             _Peer = peer;
             _Peer.OnInvokeMethodEvent += _InvokeMethod;
         }
@@ -123,7 +130,7 @@ namespace Synchronization
             _Unbind(soul, typeof(TSoul));
         }
 
-        private void _InvokeMethod(Guid entity_id, string method_name, Guid return_id, object[] args)
+        private void _InvokeMethod(Guid entity_id, int method_id, Guid return_id, byte[][] args)
         {
             var soulInfo = (from soul in _Souls
                             where soul.ID == entity_id
@@ -137,9 +144,13 @@ namespace Synchronization
                 return;
             }
 
-            var methodInfo =
+            var info = _Protocol.GetMemberMap().GetMethod(method_id);
+            
+                var methodInfo =
                     (from m in soulInfo.MethodInfos
-                     where m.Name == method_name && m.GetParameters().Length == args.Length
+                     where 
+                     m == _Protocol.GetMemberMap().GetMethod(method_id) 
+                     && m.GetParameters().Length == args.Length
                      select m)
                     .FirstOrDefault();
 
@@ -150,7 +161,9 @@ namespace Synchronization
 
             try
             {
-                var returnValue = methodInfo.Invoke(soulInfo.ObjectInstance, args) as IValue;
+                var argObjects = args.Select(arg => _Serialize.Deserialize(arg));
+
+                var returnValue = methodInfo.Invoke(soulInfo.ObjectInstance, argObjects.ToArray()) as IValue;
 
                 if(returnValue != null)
                 {
@@ -193,9 +206,9 @@ namespace Synchronization
             var package = new PackageReturnValue()
             {
                 ReturnTarget = return_id,
-                ReturnValue = value
+                ReturnValue = _Serialize.Serialize(value)
             };
-            _Queue.Push(ServerToClientOpCode.ReturnValue, package);
+            _Queue.Push(ServerToClientOpCode.ReturnValue, _Serialize.Serialize(package));
         }
 
         private void _ReturnSoulValue(Guid return_id, IValue return_value)
@@ -214,9 +227,9 @@ namespace Synchronization
 
             var newSoul = _NewSoul(soul, type);
 
-            _LoadSoul(newSoul.ObjectType, newSoul.ID, true);
+            _LoadSoul(newSoul.InterfaceId, newSoul.ID, true);
             newSoul.ProcessDifferentValues(_UpdateProperty);
-            _LoadSoulCompile(newSoul.ObjectType, newSoul.ID, return_id);
+            _LoadSoulCompile(newSoul.InterfaceId, newSoul.ID, return_id);
         }
 
         private void _Bind<TSoul>(TSoul soul, bool return_type, Guid return_id)
@@ -231,16 +244,20 @@ namespace Synchronization
             }
 
             var newSoul = _NewSoul(soul, typeof(TSoul));
-            _LoadSoul(newSoul.ObjectType, newSoul.ID, return_type);
+            _LoadSoul(newSoul.InterfaceId, newSoul.ID, return_type);
             newSoul.ProcessDifferentValues(_UpdateProperty);
-            _LoadSoulCompile(newSoul.ObjectType, newSoul.ID, return_id);
+            _LoadSoulCompile(newSoul.InterfaceId, newSoul.ID, return_id);
         }
 
         private Soul _NewSoul(object soul, Type soul_type)
         {
+            var map = _Protocol.GetMemberMap();
+            var interfaceId = map.GetInterface(soul_type);
+
             var newSoul = new Soul
                               {
                                   ID = Guid.NewGuid(),
+                                  InterfaceId = interfaceId,
                                   ObjectType = soul_type,
                                   ObjectInstance = soul,
                                   MethodInfos = soul_type.GetMethods()
@@ -278,7 +295,8 @@ namespace Synchronization
             for(var i = 0; i < properties.Length; ++i)
             {
                 var property = properties[i];
-                newSoul.PropertyHandlers[i] = new Soul.PropertyHandler(property, property.Name);
+                var id = map.GetProperty(property);
+                newSoul.PropertyHandlers[i] = new Soul.PropertyHandler(property, id);
             }
 
             _Souls.Add(newSoul);
@@ -288,88 +306,62 @@ namespace Synchronization
 
         private Delegate _BuildDelegate(EventInfo event_info, Guid new_soul_id, InvokeEventCallback invoke)
         {
-            
 
-            var parameterInfos = event_info.EventHandlerType.GetGenericArguments();
-            var argTypes = parameterInfos.Select(p => p).ToArray();
 
-            Type[] genericEventClosureTypes =
-                {
-                    typeof(GenericEventClosure),
-                    typeof(GenericEventClosure<>),
-                    typeof(GenericEventClosure<,>),
-                    typeof(GenericEventClosure<,,>),
-                    typeof(GenericEventClosure<,,,>),
-                    typeof(GenericEventClosure<,,,,>)
-                };
-
-            var type = genericEventClosureTypes[argTypes.Length].MakeGenericType(argTypes);
-
-            var instance = Activator.CreateInstance(type, new_soul_id, event_info.Name , invoke);
-
-            var actionType = type.GetMethod(nameof(GenericEventClosure.GetDelegateType)).Invoke(instance, new object[0]) as Type;
-
-            return Delegate.CreateDelegate(actionType, instance, "Run", true);
-
-            // Type[] genericEventClosureTypes =
-            // {
-            // typeof(Action),
-            // typeof(GenericEventClosure<>),
-            // typeof(GenericEventClosure<,>),
-            // typeof(GenericEventClosure<,,>),
-            // typeof(GenericEventClosure<,,,>),
-            // typeof(GenericEventClosure<,,,,>)
-            // };
+            var eventCreator = _Protocol.GetEventProvider().Find(event_info);
+            var map = _Protocol.GetMemberMap();
+            var id = map.GetEvent(event_info);
+            return eventCreator.Create(new_soul_id, id, invoke);
         }
 
-        private void _InvokeEvent(Guid entity_id, string event_name, object[] args)
+        private void _InvokeEvent(Guid entity_id, int event_id, object[] args)
         {
             var package = new PackageInvokeEvent
                               {
-                                  EventName = event_name,
+                                  EventId = event_id,
                                   EntityId = entity_id,
-                                  EventParams = args
-                              };
+                                  EventParams = (from a in args select _Serialize.Serialize(a)).ToArray()
+                                };
 
             lock(_EventFilter)
             {
-                _EventFilter.Enqueue(package);
+                _EventFilter.Enqueue(_Serialize.Serialize(package));
             }
         }
 
-        private void _LoadSoul(Type soul_type, Guid id, bool return_type)
+        private void _LoadSoul(int soul_type_id, Guid id, bool return_type)
         {
             var package = new PackageLoadSoul
                               {
-                                  TypeName = soul_type.Name,
+                                  TypeId = soul_type_id,
                                   EntityId = id,
                                   ReturnType = return_type
                               };
-            _Queue.Push(ServerToClientOpCode.LoadSoul, package);
+            _Queue.Push(ServerToClientOpCode.LoadSoul, _Serialize.Serialize(package));
         }
 
-        private void _UpdateProperty(Guid entity_id, string property_name, object val)
+        private void _UpdateProperty(Guid entity_id, int property_id, object val)
         {
             var package = new PackageUpdateProperty
                               {
                                   EntityId = entity_id,
-                                  PropertyName = property_name,
-                                  Arg = val
+                                  PropertyId = property_id,
+                                  Args = _Serialize.Serialize(val)
                               };
 
-            _Queue.Push(ServerToClientOpCode.UpdateProperty, package);
+            _Queue.Push(ServerToClientOpCode.UpdateProperty, _Serialize.Serialize(package));
         }
 
-        private void _LoadSoulCompile(Type soul_type, Guid id, Guid return_id)
+        private void _LoadSoulCompile(int soul_type_id, Guid id, Guid return_id)
         {
             var package = new PackageLoadSoulCompile
                               {
-                                  TypeName = soul_type.Name,
+                                  TypeId = soul_type_id,
                                   EntityId = id,
                                   ReturnId = return_id
                               };
 
-            _Queue.Push(ServerToClientOpCode.LoadSoulCompile, package);
+            _Queue.Push(ServerToClientOpCode.LoadSoulCompile, _Serialize.Serialize(package));
         }
 
         private void _Unbind(object soul, Type type)
@@ -378,27 +370,29 @@ namespace Synchronization
                             where soul_info.ObjectType == type && ReferenceEquals(soul_info.ObjectInstance, soul)
                             select soul_info).SingleOrDefault();
 
-            if(soulInfo != null)
+            if(soulInfo == null)
             {
-                foreach(var eventHandler in soulInfo.EventHandlers)
-                {
-                    eventHandler.EventInfo.RemoveEventHandler(soulInfo.ObjectInstance, eventHandler.DelegateObject);
-                }
-
-                _UnloadSoul(soulInfo.ObjectType, soulInfo.ID);
-
-                _Souls.Remove(soulInfo);
+                return;
             }
+
+            foreach(var eventHandler in soulInfo.EventHandlers)
+            {
+                eventHandler.EventInfo.RemoveEventHandler(soulInfo.ObjectInstance, eventHandler.DelegateObject);
+            }
+
+            _UnloadSoul(soulInfo.InterfaceId, soulInfo.ID);
+
+            _Souls.Remove(soulInfo);
         }
 
-        private void _UnloadSoul(Type soul_type, Guid id)
+        private void _UnloadSoul(int soul_type_id, Guid id)
         {
             var package = new PackageUnloadSoul
                               {
-                                  TypeName = soul_type.Name,
+                                  TypeId = soul_type_id,
                                   EntityId = id
                               };
-            _Queue.Push(ServerToClientOpCode.UnloadSoul, package);
+            _Queue.Push(ServerToClientOpCode.UnloadSoul, _Serialize.Serialize(package));
         }      
     }
 }

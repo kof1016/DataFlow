@@ -4,14 +4,13 @@
     {
         public void Working()
         {
-            foreach (var t in _GetObjectSet())
+            foreach(var t in _GetObjectSet())
             {
-                if (t.Update() == false)
+                if(t.Update() == false)
                 {
                     Remove(t);
                 }
             }
         }
     }
-
 }
