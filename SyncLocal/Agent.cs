@@ -12,11 +12,9 @@ namespace SyncLocal
 {
     public class Agent : ISoulBinder, IGhostQuerier, IUpdatable
     {
-        private readonly IProtocol _Protocol;
+        private readonly AgentCore _AgentCore;
 
         private readonly CommandBridge _CommandBridge;
-
-        private readonly GhostProvider _GhostProvider;
 
         private readonly GhostRequest _GhostRequest;
 
@@ -28,12 +26,12 @@ namespace SyncLocal
 
         public Agent(IProtocol protocol)
         {
-            _Protocol = protocol;
+            var protocol1 = protocol;
             _GhostRequest = new GhostRequest(protocol.GetSerialize());
-            _GhostProvider = new GhostProvider(_Protocol);
+            _AgentCore = new AgentCore(protocol1);
 
-            _CommandBridge = new CommandBridge(_GhostProvider, _GhostRequest);
-            _SoulProvider = new SoulProvider(_CommandBridge.RequestQueue, _CommandBridge.ResponseQueue, _Protocol);
+            _CommandBridge = new CommandBridge(_AgentCore, _GhostRequest);
+            _SoulProvider = new SoulProvider(_CommandBridge.RequestQueue, _CommandBridge.ResponseQueue, protocol1);
 
             Binder = _SoulProvider;
             GhostQuerier = this;
@@ -109,19 +107,19 @@ namespace SyncLocal
             // _GhostRequest.OnPingEvent += _OnRequestPing;
             _GhostRequest.OnReleaseEvent += _SoulProvider.Unbind;
 
-            _GhostProvider.Initial(_GhostRequest);
+            _AgentCore.Initial(_GhostRequest);
         }
 
         private INotifier<T> _QueryProvider<T>()
         {
-            return _GhostProvider.QueryProvider<T>();
+            return _AgentCore.QueryProvider<T>();
         }
 
         private void _Shutdown()
         {
             _CommandBridge.Break();
 
-            _GhostProvider.Finial();
+            _AgentCore.Finial();
 
             _GhostRequest.OnReleaseEvent -= _SoulProvider.Unbind;
         }

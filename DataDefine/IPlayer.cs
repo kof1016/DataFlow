@@ -1,7 +1,5 @@
 ﻿using Library.Synchronize;
 
-using Regulus.Utility;
-
 namespace DataDefine
 {
     public interface IPlayer

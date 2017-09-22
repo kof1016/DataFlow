@@ -67,8 +67,6 @@
     <Compile Include="Utility\Updater.cs" />
     <Compile Include="Synchronize\Value.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Game\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

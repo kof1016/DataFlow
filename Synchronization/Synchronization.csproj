@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GhostProvider.cs" />
+    <Compile Include="AgentCore.cs" />
     <Compile Include="AutoRelease.cs" />
     <Compile Include="PreGenerated\EventProvider.cs" />
     <Compile Include="PreGenerated\GenericEventClosure.cs" />

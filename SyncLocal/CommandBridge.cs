@@ -10,7 +10,7 @@ namespace SyncLocal
     {
         private event Action _OnBreakEvent;
 
-        private readonly GhostProvider _GhostProvider;
+        private readonly AgentCore _AgentCore;
 
         private readonly GhostRequest _GhostRequest;
 
@@ -18,11 +18,11 @@ namespace SyncLocal
 
         public readonly IResponseQueue ResponseQueue;
 
-        public CommandBridge(GhostProvider ghost_provider, GhostRequest ghost_request)
+        public CommandBridge(AgentCore ghost_provider, GhostRequest ghost_request)
         {
             RequestQueue = this;
             ResponseQueue = this;
-            _GhostProvider = ghost_provider;
+            _AgentCore = ghost_provider;
             _GhostRequest = ghost_request;
         }
 
@@ -44,7 +44,7 @@ namespace SyncLocal
 
         void IResponseQueue.Push(ServerToClientOpCode code, byte[] package)
         {
-            _GhostProvider.OnResponse(code, package);
+            _AgentCore.OnResponse(code, package);
         }
 
         public void Break()

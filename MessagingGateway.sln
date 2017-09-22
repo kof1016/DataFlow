@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library", "Utility\Library.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataDefine", "DataDefine\DataDefine.csproj", "{EE4FD0B5-AD5A-4F99-93D0-2A81D8DEB403}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic.Tests1", "GameLogic.Tests1\GameLogic.Tests1.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synchronization", "Synchronization\Synchronization.csproj", "{71B3C1BC-00CB-4994-9775-F8B940C81CCA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synchronization.Tests1", "Synchronization.Tests1\Synchronization.Tests1.csproj", "{65F62E8B-7C9B-46E3-A2C6-840B6DA6E485}"
@@ -47,10 +45,6 @@ Global
 		{EE4FD0B5-AD5A-4F99-93D0-2A81D8DEB403}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE4FD0B5-AD5A-4F99-93D0-2A81D8DEB403}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE4FD0B5-AD5A-4F99-93D0-2A81D8DEB403}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8EDF4429-251A-416D-BB68-93F227191BCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8EDF4429-251A-416D-BB68-93F227191BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{71B3C1BC-00CB-4994-9775-F8B940C81CCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{71B3C1BC-00CB-4994-9775-F8B940C81CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71B3C1BC-00CB-4994-9775-F8B940C81CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU

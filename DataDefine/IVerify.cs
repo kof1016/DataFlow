@@ -7,6 +7,7 @@ namespace DataDefine
         int TestProperty { get; }
 
         event System.Action<bool> TestEvent;
+
         Value<bool> Login(string id, string password);
     }
 }

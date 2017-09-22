@@ -14,7 +14,7 @@ using Synchronization.PreGenerated;
 
 namespace Synchronization
 {
-    public class GhostProvider
+    public class AgentCore
     {
         public event Action<string, string> OnErrorMethodEvent;
 
@@ -42,7 +42,7 @@ namespace Synchronization
 
         public bool Enable { get; private set; }
 
-        public GhostProvider(IProtocol protocol)
+        public AgentCore(IProtocol protocol)
         {
             _Protocol = protocol;
             _Serializer = _Protocol.GetSerialize();
@@ -203,7 +203,7 @@ namespace Synchronization
         {
             var ghost = _FindGhost(entity_id);
 
-            if (ghost != null)
+            if(ghost != null)
             {
                 var map = _Protocol.GetMemberMap();
                 var info = map.GetProperty(property);
@@ -211,11 +211,10 @@ namespace Synchronization
                 var instance = ghost.GetInstance();
                 var type = _GhostInterfaceProvider.Find(info.DeclaringType);
                 var field = type.GetField("_" + info.Name, BindingFlags.Instance | BindingFlags.NonPublic);
-                if (field != null)
+                if(field != null)
                 {
                     field.SetValue(instance, value);
                 }
-
             }
         }
 
@@ -376,35 +375,33 @@ namespace Synchronization
         {
             var ghost = _FindGhost(ghost_id);
 
-            if (ghost != null)
+            if(ghost != null)
             {
                 var map = _Protocol.GetMemberMap();
                 var info = map.GetEvent(event_id);
 
-
-                Type type = _GhostInterfaceProvider.Find(info.DeclaringType);
+                var type = _GhostInterfaceProvider.Find(info.DeclaringType);
                 var instance = ghost.GetInstance();
-                if (type != null)
+                if(type != null)
                 {
                     var eventInfos = type.GetField("_" + info.Name, BindingFlags.Instance | BindingFlags.NonPublic);
                     var fieldValue = eventInfos.GetValue(instance);
-                    if (fieldValue is Delegate)
+                    if(fieldValue is Delegate)
                     {
                         var fieldValueDelegate = fieldValue as Delegate;
 
-                        var pars = (from a in event_params select _Serializer.Deserialize(a)).ToArray();
+                        var pars = (from a in event_params
+                                    select _Serializer.Deserialize(a)).ToArray();
                         try
                         {
                             fieldValueDelegate.DynamicInvoke(pars);
                         }
-                        catch (TargetInvocationException tie)
+                        catch(TargetInvocationException tie)
                         {
-                            
                             throw tie;
                         }
-                        catch (Exception e)
+                        catch(Exception e)
                         {
-                            
                             throw e;
                         }
                     }
