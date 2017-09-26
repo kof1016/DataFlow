@@ -46,12 +46,12 @@ namespace Library.Utility
 
         private void _SetCurrentState()
         {
-            var state = _StandBys.Dequeue();
-            
-            if (state == null)
+            if(_StandBys.Count == 0)
             {
                 return;
             }
+            var state = _StandBys.Dequeue();
+                        
 
             Current?.Leave();
 

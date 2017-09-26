@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="RegulusRemoting">
-      <HintPath>..\DataDefine\bin\Debug\RegulusRemoting.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -67,6 +64,10 @@
     <Compile Include="SoulProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Serialization\Serialization.csproj">
+      <Project>{5b109ba4-3f4c-44fd-87a6-96c8ad6cdd5a}</Project>
+      <Name>Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utility\Library.csproj">
       <Project>{d62013ba-4663-4657-9fba-97d6b1776f3c}</Project>
       <Name>Library</Name>

@@ -10,6 +10,11 @@ using Synchronization.Interface;
 
 namespace Console
 {
+    /*
+     * 1：接封包
+     * 2：解封包
+     * 3：塞封包
+     */
     internal class Logic : IUpdatable, IVerify, IPlayer
     {
         private event Action<Move> OnMoveEvent;

@@ -49,10 +49,6 @@
     <Compile Include="TypeHelper\ValueHelper.cs" />
     <Compile Include="Utility\Comparison.cs" />
     <Compile Include="Utility\EmptyStage.cs" />
-    <Compile Include="TypeHelper\EnumDescriptionAttribute.cs" />
-    <Compile Include="TypeHelper\EnumDescriptionExtension.cs" />
-    <Compile Include="TypeHelper\EnumHelper.cs" />
-    <Compile Include="TypeHelper\Flag.cs" />
     <Compile Include="Framework\IBootable.cs" />
     <Compile Include="Synchronize\IGhost.cs" />
     <Compile Include="Synchronize\INotifier.cs" />

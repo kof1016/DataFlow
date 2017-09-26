@@ -53,7 +53,8 @@ namespace Console
         private void _SupplyVerify(IVerify obj)
         {
             // 直接呼叫
-                        
+            obj.Login("1", "1");
+            
 
             _Viewer.WriteLine($"property{obj.TestProperty}");
             obj.TestEvent += (result) =>

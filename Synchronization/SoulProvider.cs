@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+
 using Library.Serialization;
 using Library.Synchronize;
 
@@ -169,10 +170,10 @@ namespace Synchronization
                 {
                     _ReturnValue(return_id, returnValue);
                 }
-            }
-            catch(Exception)
-            {
-                throw new ArgumentNullException($"return value error {return_id}");
+            }           
+            catch (Exception e)
+            {                
+                throw new Exception($"call method {methodInfo.Name}:{methodInfo.DeclaringType?.FullName ?? "no type" }" , e);
             }
         }
 
