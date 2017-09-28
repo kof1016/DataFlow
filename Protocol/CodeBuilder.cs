@@ -17,6 +17,8 @@ namespace Protocol
 
         public event Action<string, string> OnGpiEvent;
 
+        
+
         private static readonly string _GhostIdName = "_GhostIdName";
 
         public void Build(string protocol_name, Type[] types)
@@ -76,6 +78,11 @@ namespace Protocol
                 {
                     if(methodInfo.IsPublic && methodInfo.IsSpecialName == false)
                     {
+                        foreach(var parameterInfo in methodInfo.GetParameters())
+                        {
+                            serializerTypes.Add(parameterInfo.ParameterType);
+                        }
+
                         memberMapMethodBuilder.Add($"typeof({type.FullName}).GetMethod(\"{methodInfo.Name}\")");
                     }
                 }
@@ -198,18 +205,22 @@ namespace Protocol
 
                 foreach (var type in new TypeDisintegrator(serializerType).Types)
                 {
+                    
                     types.Add(type);
                 }
             }
-            var typeCodes = (from type in types orderby type.FullName select "typeof(" + _GetTypeName(type) + ")").ToArray();
+            var typeCodes = (from type in types orderby type.FullName
+                             select new { Code = "typeof(" + _GetTypeName(type) + ")" , Assembly = type.Assembly.Location }).ToArray();
 
+            
+        
             //            foreach (var type in types)
             //            {
             //                Regulus.Utility.Log.Instance.WriteInfo(type.FullName);
             //            }
             //            Regulus.Utility.Log.Instance.WriteInfo("Serializable object " + types.Count);
 
-            return typeCodes;
+            return typeCodes.Select( t =>t.Code).ToArray();
         }
 
         private string _BuildGhostCode(Type type)

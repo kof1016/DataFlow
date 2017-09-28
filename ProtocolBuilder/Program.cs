@@ -70,6 +70,8 @@ namespace ProtocolBuilder
             {
                 Console.WriteLine(e.ToString());
                 Console.WriteLine("Build failure.");
+
+                throw e;
             }
         }
 
