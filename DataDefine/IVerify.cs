@@ -1,4 +1,4 @@
-using Library.Synchronize;
+using Gateway.Synchronize;
 
 namespace DataDefine
 {

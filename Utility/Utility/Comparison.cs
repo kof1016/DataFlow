@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Library.Utility
+namespace Gateway.Utility
 {
     public class Comparison<T>
     {

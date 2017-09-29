@@ -54,10 +54,17 @@
       <Project>{546258ff-3c0e-4403-9e59-0e4e5d6689a4}</Project>
       <Name>Protocol</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Utility\Library.csproj">
+    <ProjectReference Include="..\Utility\Gateway.csproj">
       <Project>{d62013ba-4663-4657-9fba-97d6b1776f3c}</Project>
-      <Name>Library</Name>
+      <Name>Gateway</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if exist $(ProjectDir)..\..\..\Publish\Unity (
+copy /y $(TargetPath) $(ProjectDir)..\..\..\Publish\Unity
+copy /y $(TargetDir)$(TargetName).pdb $(ProjectDir)..\..\..\Publish\Unity
+)
+$(ProjectDir)..\..\..\Tools\Unity3DTools\pdb2mdb.exe  $(ProjectDir)..\..\..\Publish\Unity\$(TargetFileName)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

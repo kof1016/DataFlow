@@ -1,6 +1,6 @@
 using System;
 
-using Library.Serialization;
+using Gateway.Serialization;
 
 namespace Serialization
 {

@@ -8,7 +8,7 @@ using Synchronization.PreGenerated;
 
 using SyncLocal;
 
-using Updater = Library.Utility.Updater;
+using Updater = Gateway.Utility.Updater;
 
 namespace Console
 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Library.Synchronize;
+using Gateway.Synchronize;
 
 using Serialization;
 
@@ -47,7 +47,6 @@ namespace Protocol
                 TypeDisintegrator._Add(_GetPropertys(type), types);
                 TypeDisintegrator._Add(_GetMethods(type), types);
                 TypeDisintegrator._Add(_GetFields(type), types);
-
             }
 
             Types = types.ToArray();
@@ -132,7 +131,7 @@ namespace Protocol
             var types = new List<Type>();
             foreach(var methodInfo in type.GetMethods())
             {
-                if(methodInfo.IsGenericMethod || methodInfo.IsHideBySig )
+                if(methodInfo.IsGenericMethod)
                 {
                     continue;
                 }

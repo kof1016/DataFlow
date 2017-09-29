@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Library.Synchronize
+namespace Gateway.Synchronize
 {
     public class TProvider<T> : INotifier<T>, IProvider where T : class
     {

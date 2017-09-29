@@ -1,7 +1,7 @@
 ﻿using System;
 
-using Library.Synchronize;
-using Library.Utility;
+using Gateway.Synchronize;
+using Gateway.Utility;
 
 namespace Synchronization.Interface
 {

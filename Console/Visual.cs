@@ -1,28 +1,29 @@
 ﻿using System;
-using System.CodeDom;
 
 using DataDefine;
 
-using Library.Framework;
-using Library.Synchronize;
+using Gateway.Framework;
+using Gateway.Synchronize;
 
 using Regulus.Utility;
 
-using Synchronization;
 using Synchronization.Interface;
 
-using IUpdatable = Library.Utility.IUpdatable;
+using IUpdatable = Gateway.Utility.IUpdatable;
 
 namespace Console
 {
     public class Visual : IUpdatable
     {
-        private readonly IGhostQuerier _GhostQuerier;
         private readonly Command _Command;
+
+        private readonly IGhostQuerier _GhostQuerier;
+
         private readonly Regulus.Utility.Console.IViewer _Viewer;
 
-        public Visual(IGhostQuerier ghost_querier,
-            Command command, 
+        public Visual(
+            IGhostQuerier ghost_querier,
+            Command command,
             Regulus.Utility.Console.IViewer viewer)
         {
             _GhostQuerier = ghost_querier;
@@ -33,16 +34,18 @@ namespace Console
         void IBootable.Launch()
         {
             _Command.Register(
-                "start",
-                () =>
-                {
-                    _GhostQuerier.QueryNotifier<IVerify>().Supply += _SupplyVerify;
-                });
+                              "start",
+                              () => { _GhostQuerier.QueryNotifier<IVerify>().Supply += _SupplyVerify; });
         }
 
         void IBootable.Shutdown()
         {
             _Shutdown();
+        }
+
+        bool IUpdatable.Update()
+        {
+            return true;
         }
 
         private void _Shutdown()
@@ -54,25 +57,19 @@ namespace Console
         {
             // 直接呼叫
             obj.Login("1", "1");
-            
 
             _Viewer.WriteLine($"property{obj.TestProperty}");
-            obj.TestEvent += (result) =>
-            {
-                _Viewer.WriteLine($"event {result}");
-            };
-
+            obj.TestEvent += result => { _Viewer.WriteLine($"event {result}"); };
 
             // command 使用方法1
-            //            _Command.Register<string, string>(
-            //                "m [a1, a2]", 
-            //                (a1, a2) => { obj.Login(a1, a2); });
+            // _Command.Register<string, string>(
+            // "m [a1, a2]", 
+            // (a1, a2) => { obj.Login(a1, a2); });
 
             // command 使用方法2
-
-
             _Command.RegisterLambda<IVerify, string, string, Value<bool>>
-                    (obj,
+                    (
+                     obj,
                      (instance, a1, a2) => instance.Login(a1, a2),
                      _ReturnValue);
         }
@@ -80,11 +77,11 @@ namespace Console
         private void _ReturnValue(Value<bool> return_value)
         {
             return_value.OnValueEvent += result =>
-                {
-                    _Viewer.WriteLine("==Visual Show==");
+            {
+                _Viewer.WriteLine("==Visual Show==");
 
-                    _Viewer.WriteLine($"Login result = {result}");
-                };
+                _Viewer.WriteLine($"Login result = {result}");
+            };
         }
 
         private void Instance_OnMoveEvent(string arg1, string arg2)
@@ -100,13 +97,6 @@ namespace Console
         private void _ReturnValuePlayer(Action obj)
         {
             throw new NotImplementedException();
-        }
-
-        
-
-        bool IUpdatable.Update()
-        {
-            return true;
         }
     }
 }

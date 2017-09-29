@@ -1,6 +1,6 @@
 using System;
 
-namespace Library.Synchronize
+namespace Gateway.Synchronize
 {
     public class Value<T> : IValue
     {

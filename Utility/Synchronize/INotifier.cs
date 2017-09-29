@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Library.Synchronize
+namespace Gateway.Synchronize
 {
     /// <summary>
     ///     介面物件通知器

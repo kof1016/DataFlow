@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Library.Synchronize;
+using Gateway.Synchronize;
 
 namespace Synchronization
 {

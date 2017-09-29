@@ -1,4 +1,4 @@
-namespace Library.Serialization
+namespace Gateway.Serialization
 {
     public interface ISerializer
     {

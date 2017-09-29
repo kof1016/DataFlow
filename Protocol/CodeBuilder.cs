@@ -17,8 +17,6 @@ namespace Protocol
 
         public event Action<string, string> OnGpiEvent;
 
-        
-
         private static readonly string _GhostIdName = "_GhostIdName";
 
         public void Build(string protocol_name, Type[] types)
@@ -78,11 +76,6 @@ namespace Protocol
                 {
                     if(methodInfo.IsPublic && methodInfo.IsSpecialName == false)
                     {
-                        foreach(var parameterInfo in methodInfo.GetParameters())
-                        {
-                            serializerTypes.Add(parameterInfo.ParameterType);
-                        }
-
                         memberMapMethodBuilder.Add($"typeof({type.FullName}).GetMethod(\"{methodInfo.Name}\")");
                     }
                 }
@@ -138,7 +131,7 @@ namespace Protocol
                     Synchronization.PreGenerated.InterfaceProvider _InterfaceProvider;
                     Synchronization.PreGenerated.EventProvider _EventProvider;
                     Synchronization.PreGenerated.MemberMap _MemberMap;
-                    Library.Serialization.ISerializer _Serializer;
+                    Gateway.Serialization.ISerializer _Serializer;
                     public {protocolName}()
                     {{
                         var types = new Dictionary<Type, Type>();
@@ -166,7 +159,7 @@ namespace Protocol
                         return _EventProvider;
                     }}
 
-                    Library.Serialization.ISerializer Synchronization.PreGenerated.IProtocol.GetSerialize()
+                    Gateway.Serialization.ISerializer Synchronization.PreGenerated.IProtocol.GetSerialize()
                     {{
                         return _Serializer;
                     }}
@@ -205,22 +198,18 @@ namespace Protocol
 
                 foreach (var type in new TypeDisintegrator(serializerType).Types)
                 {
-                    
                     types.Add(type);
                 }
             }
-            var typeCodes = (from type in types orderby type.FullName
-                             select new { Code = "typeof(" + _GetTypeName(type) + ")" , Assembly = type.Assembly.Location }).ToArray();
+            var typeCodes = (from type in types orderby type.FullName select "typeof(" + _GetTypeName(type) + ")").ToArray();
 
-            
-        
             //            foreach (var type in types)
             //            {
             //                Regulus.Utility.Log.Instance.WriteInfo(type.FullName);
             //            }
             //            Regulus.Utility.Log.Instance.WriteInfo("Serializable object " + types.Count);
 
-            return typeCodes.Select( t =>t.Code).ToArray();
+            return typeCodes;
         }
 
         private string _BuildGhostCode(Type type)
@@ -245,11 +234,11 @@ namespace Protocol
     
     namespace {nameSpace}.Ghost 
     {{ 
-        public class C{name} : {_GetTypeName(type)}, Library.Synchronize.IGhost
+        public class C{name} : {_GetTypeName(type)}, Gateway.Synchronize.IGhost
         {{
-            private event Library.Synchronize.CallMethodCallback _OnCallMethodEvent;
+            private event Gateway.Synchronize.CallMethodCallback _OnCallMethodEvent;
             
-            event Library.Synchronize.CallMethodCallback Library.Synchronize.IGhost.CallMethodEvent
+            event Gateway.Synchronize.CallMethodCallback Gateway.Synchronize.IGhost.CallMethodEvent
             {{
                 add {{ this._OnCallMethodEvent += value; }}
                 remove {{ this._OnCallMethodEvent -= value; }}
@@ -268,22 +257,22 @@ namespace Protocol
                 _GhostType = ghost_type;
             }}
             
-            Guid Library.Synchronize.IGhost.GetID()
+            Guid Gateway.Synchronize.IGhost.GetID()
             {{
                 return {CodeBuilder._GhostIdName};
             }}
 
-            object Library.Synchronize.IGhost.GetInstance()
+            object Gateway.Synchronize.IGhost.GetInstance()
             {{
                 return this;
             }}
 
-            bool Library.Synchronize.IGhost.IsReturnType()
+            bool Gateway.Synchronize.IGhost.IsReturnType()
             {{
                 return _HaveReturn;
             }}
 
-            Type Library.Synchronize.IGhost.GetType()
+            Type Gateway.Synchronize.IGhost.GetType()
             {{
                 return _GhostType;
             }}
@@ -367,12 +356,12 @@ namespace Protocol
                 {
                     var returnType = methodInfo.ReturnType.GetGenericArguments()[0];
 
-                    returnTypeCode = $"Library.Synchronize.Value<{_GetTypeName(returnType)}>";
+                    returnTypeCode = $"Gateway.Synchronize.Value<{_GetTypeName(returnType)}>";
                 }
 
                 var returnValue = string.Empty;
 
-                var addReturn = "Library.Synchronize.IValue returnValue = null;";
+                var addReturn = "Gateway.Synchronize.IValue returnValue = null;";
 
                 if (haveReturn)
                 {

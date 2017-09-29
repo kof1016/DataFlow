@@ -7,8 +7,8 @@
     <ProjectGuid>{D62013BA-4663-4657-9FBA-97D6B1776F3C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Library</RootNamespace>
-    <AssemblyName>MessagingGatewayLibrary</AssemblyName>
+    <RootNamespace>Gateway</RootNamespace>
+    <AssemblyName>Gateway</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -29,6 +29,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -63,6 +66,12 @@
     <Compile Include="Utility\Updater.cs" />
     <Compile Include="Synchronize\Value.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if exist $(ProjectDir)..\..\..\Publish\Unity (
+copy /y $(TargetPath) $(ProjectDir)..\..\..\Publish\Unity
+copy /y $(TargetDir)$(TargetName).pdb $(ProjectDir)..\..\..\Publish\Unity
+)
+$(ProjectDir)..\..\..\Tools\Unity3DTools\pdb2mdb.exe  $(ProjectDir)..\..\..\Publish\Unity\$(TargetFileName)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-using Library.Serialization;
+using Gateway.Serialization;
 
 using Synchronization;
 using Synchronization.Data;

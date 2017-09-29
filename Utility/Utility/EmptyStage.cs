@@ -1,4 +1,4 @@
-namespace Library.Utility
+namespace Gateway.Utility
 {
     public class EmptyStage : IStage
     {

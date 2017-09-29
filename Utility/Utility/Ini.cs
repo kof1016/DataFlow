@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Library.Utility
+namespace Gateway.Utility
 {
     public class Ini
     {

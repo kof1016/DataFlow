@@ -2,7 +2,6 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,28 +23,25 @@ namespace Protocol
 
             var provider = new CSharpCodeProvider(optionsDic);
 
-
-
-            
-            var codes = AssemblyBuilder._BuildCode(assembly, protocol_name);
-            File.WriteAllLines("dump.cs", codes.ToArray());
-
-
             var options = new CompilerParameters
             {
-                IncludeDebugInformation = true,
                 GenerateInMemory = false,
                 GenerateExecutable = false,
                 OutputAssembly = output_path,
-                TempFiles = new TempFileCollection(@"D:\VOH_SVN\common\VoH.Game\VoH.Define\bin\Debug\out" , true)
+                ReferencedAssemblies =
+                {
+                    "System.Core.dll",
+                    "System.xml.dll",
+                    "Gateway.dll",
+                    "Synchronization.dll",
+                    "Serialization.dll",
+                    assembly.Location
+                },
+                TempFiles = new TempFileCollection()
             };
 
-            _FindAllAssemblies(options.ReferencedAssemblies , assembly);
-            options.ReferencedAssemblies.Add("MessagingGatewayLibrary.dll");
-            options.ReferencedAssemblies.Add("MessagingGatewaySynchronization.dll");
-            options.ReferencedAssemblies.Add("MessagingGatewaySerialization.dll");
-            
-
+            var codes = AssemblyBuilder._BuildCode(assembly, protocol_name);
+            File.WriteAllLines("dump.cs", codes.ToArray());
             var result = provider.CompileAssemblyFromSource(options, codes.ToArray());
             if(result.Errors.Count <= 0)
             {
@@ -58,100 +54,57 @@ namespace Protocol
             throw new Exception("Protocol compile error");
         }
 
-        private void _FindAllAssemblies(StringCollection options_referenced_assemblies, Assembly assembly)
+        // static build in memory
+        public Assembly Build(Assembly assembly, string protocol_name)
         {
-            HashSet<string> locations = new HashSet<string>();
-            HashSet<Type> checkedTypes = new HashSet<Type>();
-            var types = assembly.GetExportedTypes();
-
-            foreach(var type in types)
+            var optionsDic = new Dictionary<string, string>
             {
-                _Record(type , locations , checkedTypes);
-            }
-            foreach(var location in locations)
-            {
-                if(location.Contains("mscorlib") == false)
-                    options_referenced_assemblies.Add(location);
-            }
-        }
+                {
+                    "CompilerVersion", "v4.6"
+                }
+            };
 
-        private void _Record(Type type, HashSet<string> locations, HashSet<Type> checked_types)
-        {
-            if(type == null || checked_types.Contains(type))
-            {
-                return;
-            }
+            var provider = new CSharpCodeProvider(optionsDic);
 
-            checked_types.Add(type);
+            var options = new CompilerParameters
+            {
+                GenerateInMemory = true,
+                GenerateExecutable = false,
+
+                ReferencedAssemblies =
+                {
+                    "System.Core.dll",
+                    "System.xml.dll",
+                    "Gateway.dll",
+                    "Synchronization.dll",
+                    "Serialization.dll",
+                    assembly.Location
+                },
+                TempFiles = new TempFileCollection()
+            };
+
+            var codes = AssemblyBuilder._BuildCode(assembly, protocol_name);
+            File.WriteAllLines("dump.cs", codes.ToArray());
+            var result = provider.CompileAssemblyFromSource(options, codes.ToArray());
+            if(result.Errors.Count <= 0)
+            {
+                return result.CompiledAssembly;
+            }
+            File.WriteAllLines("error.log", _GetErrors(result.Errors).ToArray());
+            
             
 
-            if (type == typeof(object))
-            {
-                return;
-            }
-            locations.Add(type.Assembly.Location);
-            _Record(type.BaseType, locations, checked_types);
-
-            var methods = type.GetMethods();
-
-            foreach(var methodInfo in methods)
-            {
-                if(methodInfo.IsGenericMethod || methodInfo.IsPrivate)
-                    continue;
-
-                foreach(var parameterInfo in methodInfo.GetParameters())
-                {
-                    _Record(parameterInfo.ParameterType, locations, checked_types);
-                }
-
-
-                var returnParam = methodInfo.ReturnParameter;
-                if(returnParam == null)
-                    continue;
-
-                var returnType = returnParam.ParameterType;
-                if(returnType.IsGenericType 
-                    && returnType.GetGenericTypeDefinition() == typeof(Library.Synchronize.Value<>))
-                {
-                    foreach(var argType in returnType.GetGenericArguments())
-                    {
-                        _Record(argType, locations, checked_types);
-                    }
-                }
-            }
-
-
-            var properties = type.GetProperties(BindingFlags.Public);
-
-            foreach(var propertyInfo in properties)
-            {
-                _Record(propertyInfo.PropertyType, locations, checked_types);
-            }
-
-
-            var events = type.GetEvents(BindingFlags.Public);
-
-            foreach (var e in events)
-            {
-                if(e.IsSpecialName == true)
-                    continue;
-
-                _Record(e.EventHandlerType , locations, checked_types);
-            }
+            throw new Exception("static Protocol compile error in memory version");
         }
 
-        // static build in memory
-        
-
-        private static List<string> _BuildCode(Assembly assembly, string protocol_name )
+        private static List<string> _BuildCode(Assembly assembly, string protocol_name)
         {
-        
             var codes = new List<string>();
             var codeBuilder = new CodeBuilder();
             codeBuilder.OnProviderEvent += (name, code) => codes.Add(code);
             codeBuilder.OnEventEvent += (type_name, event_name, code) => codes.Add(code);
-            codeBuilder.OnGpiEvent += (type_name, code) => codes.Add(code);            
-            codeBuilder.Build(protocol_name, assembly.GetExportedTypes());        
+            codeBuilder.OnGpiEvent += (type_name, code) => codes.Add(code);
+            codeBuilder.Build(protocol_name, assembly.GetExportedTypes());
             return codes;
         }
 
@@ -182,7 +135,7 @@ namespace Protocol
 //            };
 //
 //            var codes = new List<string>();
-//            var codeBuilder = new Library.Utility.CodeBuilder();
+//            var codeBuilder = new Gateway.Utility.CodeBuilder();
 //            codeBuilder.OnEventEvent += (type_name, event_name, code) => codes.Add(code);
 //            codeBuilder.GpiEvent += (type_name, code) => { codes.Add(code); };
 //            codeBuilder.Build(base_type);

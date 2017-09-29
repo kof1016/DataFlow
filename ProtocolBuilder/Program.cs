@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-using Library.Utility;
+using Gateway.Utility;
 
 using Protocol;
 
@@ -70,8 +70,6 @@ namespace ProtocolBuilder
             {
                 Console.WriteLine(e.ToString());
                 Console.WriteLine("Build failure.");
-
-                throw e;
             }
         }
 

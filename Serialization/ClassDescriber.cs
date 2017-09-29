@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-using Library.Serialization;
+using Gateway.Serialization;
 
 namespace Serialization
 {

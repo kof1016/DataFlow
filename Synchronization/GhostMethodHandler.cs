@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Reflection;
 
-using Library.Synchronize;
+using Gateway.Synchronize;
 
 using Synchronization.Data;
 using Synchronization.Interface;

@@ -1,8 +1,8 @@
 ﻿using System;
 
-using Library.Framework;
-using Library.Synchronize;
-using Library.Utility;
+using Gateway.Framework;
+using Gateway.Synchronize;
+using Gateway.Utility;
 
 using Synchronization;
 using Synchronization.Interface;

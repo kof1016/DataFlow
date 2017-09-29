@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using Library.Framework;
+using Gateway.Framework;
 
-namespace Library.Utility
+namespace Gateway.Utility
 {
     public class Launcher<T> where T : IBootable
     {

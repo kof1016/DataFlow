@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 
 
-using Library.Serialization;
-using Library.Synchronize;
+using Gateway.Serialization;
+using Gateway.Synchronize;
 
 using Synchronization.Data;
 using Synchronization.Interface;

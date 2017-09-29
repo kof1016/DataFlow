@@ -1,4 +1,4 @@
-﻿namespace Library.Framework
+﻿namespace Gateway.Framework
 {
     /// <summary>
     /// 啟動器

@@ -77,9 +77,9 @@
       <Project>{8050FA1D-C949-4F99-84BC-C498993C7A30}</Project>
       <Name>SyncLocal</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Utility\Library.csproj">
-      <Project>{D62013BA-4663-4657-9FBA-97D6B1776F3C}</Project>
-      <Name>Library</Name>
+    <ProjectReference Include="..\Utility\Gateway.csproj">
+      <Project>{d62013ba-4663-4657-9fba-97d6b1776f3c}</Project>
+      <Name>Gateway</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -48,17 +48,24 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serialization\Serialization.csproj">
-      <Project>{5B109BA4-3F4C-44FD-87A6-96C8AD6CDD5A}</Project>
+      <Project>{5b109ba4-3f4c-44fd-87a6-96c8ad6cdd5a}</Project>
       <Name>Serialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Synchronization\Synchronization.csproj">
       <Project>{71b3c1bc-00cb-4994-9775-f8b940c81cca}</Project>
       <Name>Synchronization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Utility\Library.csproj">
+    <ProjectReference Include="..\Utility\Gateway.csproj">
       <Project>{d62013ba-4663-4657-9fba-97d6b1776f3c}</Project>
-      <Name>Library</Name>
+      <Name>Gateway</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if exist $(ProjectDir)..\..\..\Publish\Unity (
+copy /y $(TargetPath) $(ProjectDir)..\..\..\Publish\Unity
+copy /y $(TargetDir)$(TargetName).pdb $(ProjectDir)..\..\..\Publish\Unity
+)
+$(ProjectDir)..\..\..\Tools\Unity3DTools\pdb2mdb.exe  $(ProjectDir)..\..\..\Publish\Unity\$(TargetFileName)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

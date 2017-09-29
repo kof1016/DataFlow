@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Timers;
 
-using Library.Serialization;
-using Library.Synchronize;
-using Library.Utility;
+using Gateway.Serialization;
+using Gateway.Synchronize;
+using Gateway.Utility;
 
 using Synchronization.Data;
 using Synchronization.Interface;

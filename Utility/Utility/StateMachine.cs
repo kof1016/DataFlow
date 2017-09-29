@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Library.Utility
+namespace Gateway.Utility
 {
     public class StateMachine
     {

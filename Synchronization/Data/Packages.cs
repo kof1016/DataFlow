@@ -1,7 +1,7 @@
 using System;
 
-using Library.Serialization;
-using Library.Synchronize;
+using Gateway.Serialization;
+using Gateway.Synchronize;
 
 namespace Synchronization.Data
 {

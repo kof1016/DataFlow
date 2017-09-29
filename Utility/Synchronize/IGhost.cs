@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Library.Synchronize
+namespace Gateway.Synchronize
 {
     public delegate void CallMethodCallback(MethodInfo info, object[] args, IValue return_value);
 

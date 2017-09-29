@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 using DataDefine;
 
-using Library.Framework;
-using Library.Utility;
+using Gateway.Framework;
+using Gateway.Utility;
 
 using Synchronization.Interface;
 

@@ -1,6 +1,6 @@
-﻿using Library.Framework;
+﻿using Gateway.Framework;
 
-namespace Library.Utility
+namespace Gateway.Utility
 {
     /// <summary>
     /// 更新器

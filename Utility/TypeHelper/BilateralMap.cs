@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Library.TypeHelper
+namespace Gateway.TypeHelper
 {
     public class BilateralMap<TItem1, TItem2>
     {

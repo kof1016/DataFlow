@@ -1,5 +1,5 @@
 ﻿
-using Library.Serialization;
+using Gateway.Serialization;
 
 namespace Synchronization.PreGenerated
 {
